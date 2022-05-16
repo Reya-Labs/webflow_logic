@@ -109,7 +109,19 @@ const getYesVote = async () => {
     return yesVote;
 };
 
-const publishVotingEndDate = async (web3, contractAddress, contractABI) => {
+const publishVotingEndDate = async (web3) => {
+    const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
+    let contractABI;
+
+    await $.getJSON(
+        "https://api.jsonbin.io/b/628273a525069545a338e71c",
+        function (data) {
+            // JSON result in `data` variable
+            console.log("Community Deployer ABI: ");
+            contractABI = data.abi;
+        }
+    );
+
     console.log('inside the publishVotingEndDate function');
     const communityDeployerContract = new web3.eth.Contract(
         contractABI,
