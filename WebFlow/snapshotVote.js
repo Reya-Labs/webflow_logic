@@ -233,7 +233,7 @@ const vote = async (web3) => {
     const yesVote = getYesVote();
 
     await $.getJSON(
-        "https://api.jsonbin.io/b/6282718d019db46796a15e3f",
+        "https://api.jsonbin.io/b/628273a525069545a338e71c",
         function (data) {
             // JSON result in `data` variable
             console.log("Community Deployer ABI: ");
