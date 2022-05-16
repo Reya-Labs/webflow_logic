@@ -147,8 +147,11 @@ const publishVotingEndDate = async (web3) => {
     console.log('after the community deployer contract instance is created');
     console.log('Community Deployer Contract: ', communityDeployerContract);
     const endDate = await communityDeployerContract.blockTimestampVotingEnd();
-    console.log('Printing endDate :', parseInt(endDate, 16));
-    document.getElementById("voting-end-date").innerHTML = parseInt(endDate, 16); // injects the endDate into the section where it needs to be displayed
+    console.log('Printing endDate in unix :', parseInt(endDate, 16));
+    const dateObject = new Date(endDate * 1000);
+    console.log("Printing the dateObject date: ", dateObject);
+    console.log("Printing the dateObject in localeString", dateObject.toLocaleString())
+    document.getElementById("voting-end-date").innerHTML = dateObject.toLocaleString(); // injects the endDate into the section where it needs to be displayed
 };
 
 // const publishVotingEndDate = async (web3) => {
