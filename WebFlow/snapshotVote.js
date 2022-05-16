@@ -120,6 +120,8 @@ const publishVotingEndDate = async (web3, contractAddress, contractABI) => {
     document.getElementById("voting-end-date").innerHTML = endDate; // injects the endDate into the section where it needs to be displayed
 };
 
+// yes and no vote as a separate function 
+
 const castVoteEthers = async (
     contractAddress,
     contractABI,
@@ -140,6 +142,8 @@ const castVoteEthers = async (
 
             try {
                 const account = await signer.getAddress();
+                console.log("tokenId: ", getTokenId());
+                console.log("yes Vote boolean: ", getYesVote());
                 console.log("account", account);
                 txResponse = await communityDeployerContract.castVote(tokenId, yesVote);
 
@@ -147,7 +151,9 @@ const castVoteEthers = async (
                     await txResponse.wait();
                     console.log("Success");
                     const totalYesCount = await communityDeployerContract.yesVoteCount();
+                    console.log("total yes count boolean: ", totalYesCount);
                     const totalNoCount = await communityDeployerContract.noVoteCount();
+                    console.log("total No count boolean: ", totalNoCount);
                     // get and display the nr of yes and no votes in the poll below
                     document.getElementById("nr-yes-votes").innerHTML =
                         totalYesCount.toString();
