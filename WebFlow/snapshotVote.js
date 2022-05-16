@@ -99,7 +99,7 @@ const connectWallet = async () => {
 
 const getTokenId = async () => {
     /// retrive the tokenId from the text field here; id = field
-    const tokenId = await document.getElementById("field").;
+    const tokenId = await document.getElementById("field").value;
     return tokenId;
 };
 
