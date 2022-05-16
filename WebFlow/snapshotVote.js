@@ -146,7 +146,7 @@ const publishVotingEndDate = async (web3) => {
 
     console.log('after the community deployer contract instance is created');
     console.log('Community Deployer Contract: ', communityDeployerContract);
-    const endDate = await communityDeployerContract.blockTimestampVotingEnd();
+    const endDate = await communityDeployerContract.blockTimestampVotingEnd().toString();
     console.log('Printing endDate: ', endDate);
     document.getElementById("voting-end-date").innerHTML = endDate; // injects the endDate into the section where it needs to be displayed
 };
