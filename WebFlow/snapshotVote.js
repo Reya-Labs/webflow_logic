@@ -110,13 +110,16 @@ const getYesVote = async () => {
 };
 
 const publishVotingEndDate = async (web3, contractAddress, contractABI) => {
+    console.log('inside the publishVotingEndDate function');
     const communityDeployerContract = new web3.eth.Contract(
         contractABI,
         contractAddress
     ); // create instance of the contract to retrieve data from.
+    console.log('after the community deployer contract instance is created');
     const endDate = await communityDeployerContract // gets the endDate for the vote
         .blockTimeStampVotingEnd()
         .toString();
+    console.log('Printing endDate: ', endDate);
     document.getElementById("voting-end-date").innerHTML = endDate; // injects the endDate into the section where it needs to be displayed
 };
 
