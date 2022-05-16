@@ -97,15 +97,15 @@ const connectWallet = async () => {
     }
 };
 
-const getTokenId = () => {
+const getTokenId = async () => {
     /// retrive the tokenId from the text field here; id = field
-    const tokenId = document.getElementById("field").value;
+    const tokenId = await document.getElementById("field").;
     return tokenId;
 };
 
-const getYesVote = () => {
+const getYesVote = async () => {
     /// retrive the vote of the user from the radio buttons
-    const yesVote = document.getElementById("radio").value; //  yes radio button has field id 'radio'
+    const yesVote = await document.getElementById("radio").checked; //  yes radio button has field id 'radio'
     return yesVote;
 };
 
@@ -142,8 +142,8 @@ const castVoteEthers = async (
 
             try {
                 const account = await signer.getAddress();
-                console.log("tokenId: ", getTokenId());
-                console.log("yes Vote boolean: ", getYesVote());
+                console.log("tokenId: ", await getTokenId());
+                console.log("yes Vote boolean: ", await getYesVote());
                 console.log("account", account);
                 txResponse = await communityDeployerContract.castVote(tokenId, yesVote);
 
@@ -202,8 +202,8 @@ const castVoteWeb3 = async (
             try {
                 const account = await web3.currentProvider.accounts[0];
                 console.log("web3.currentProvider", web3.currentProvider);
-                console.log("tokenId: ", getTokenId());
-                console.log("yes Vote boolean: ", getYesVote());
+                console.log("tokenId: ", await getTokenId());
+                console.log("yes Vote boolean: ", await getYesVote());
                 console.log("account", account);
 
 
