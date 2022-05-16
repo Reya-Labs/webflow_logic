@@ -120,55 +120,6 @@ const publishVotingEndDate = async (web3, contractAddress, contractABI) => {
     document.getElementById("voting-end-date").innerHTML = endDate; // injects the endDate into the section where it needs to be displayed
 };
 
-const castVoteWeb3 = async (
-    // how to get the tokenID information from the input field on the form?
-    web3,
-    contractAddress,
-    contractABI,
-    tokenId,
-    yesVote
-) => {
-    statusElement.innerHTML = `Status: Pending`;
-    try {
-        if (web3) {
-            console.log("web3", web3);
-
-            const communityDeployerContract = new web3.eth.Contract(
-                contractABI,
-                contractAddress
-            );
-            console.log(communityDeployerContract);
-
-            try {
-                const account = await web3.currentProvider.accounts[0];
-                console.log("web3.currentProvider", web3.currentProvider);
-                console.log("account", account);
-
-                // show the nr of yes and no votes in the poll so far
-                const totalYesCount = await communityDeployerContract.yesVoteCount();
-                const totalNoCount = await communityDeployerContract.noVoteCount();
-                document.getElementById("nr-yes-votes").innerHTML =
-                    totalYesCount.toString();
-                document.getElementById("nr-no-votes").innerHTML =
-                    totalNoCount.toString();
-
-                const receipt = await communityDeployerContract.methods
-                    .castVote(tokenId, yesVote)
-                    .send({ from: account });
-                console.log(receipt);
-                statusElement.innerHTML = `Status: Success`;
-            } catch (error) {
-                console.log("updating status element: Status Failed");
-                console.log(error.message);
-            }
-        } else {
-            console.log("Web3 object doesn't exist!");
-        }
-    } catch (error) {
-        console.log(error);
-    }
-};
-
 const castVoteEthers = async (
     contractAddress,
     contractABI,
@@ -223,10 +174,54 @@ const castVoteEthers = async (
     }
 };
 
-/// I guess that we need both web3 and also ethers and just see which one works which is why we have the 2 functions above
-/// Where do we put the abi for the contract? jsonbin
-/// how do we receive the information about the yesVote from the radio button? retrieve from html elements
-/// how to retrieve the information about the typed tokenId from the text input field? same as above (connect-metamask id for this button)
+const castVoteWeb3 = async (
+    // how to get the tokenID information from the input field on the form?
+    web3,
+    contractAddress,
+    contractABI,
+    tokenId,
+    yesVote
+) => {
+    statusElement.innerHTML = `Status: Pending`;
+    try {
+        if (web3) {
+            console.log("web3", web3);
+
+            const communityDeployerContract = new web3.eth.Contract(
+                contractABI,
+                contractAddress
+            );
+            console.log(communityDeployerContract);
+
+            try {
+                const account = await web3.currentProvider.accounts[0];
+                console.log("web3.currentProvider", web3.currentProvider);
+                console.log("account", account);
+
+                // show the nr of yes and no votes in the poll so far
+                const totalYesCount = await communityDeployerContract.yesVoteCount();
+                const totalNoCount = await communityDeployerContract.noVoteCount();
+                document.getElementById("nr-yes-votes").innerHTML =
+                    totalYesCount.toString();
+                document.getElementById("nr-no-votes").innerHTML =
+                    totalNoCount.toString();
+
+                const receipt = await communityDeployerContract.methods
+                    .castVote(tokenId, yesVote)
+                    .send({ from: account });
+                console.log(receipt);
+                statusElement.innerHTML = `Status: Success`;
+            } catch (error) {
+                console.log("updating status element: Status Failed");
+                console.log(error.message);
+            }
+        } else {
+            console.log("Web3 object doesn't exist!");
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 const vote = async (web3) => {
     // change this to the mainnet adddress of the NFT contract
@@ -238,7 +233,7 @@ const vote = async (web3) => {
     const yesVote = getYesVote();
 
     await $.getJSON(
-        "<https://api.jsonbin.io/b/628260c4019db46796a14126>",
+        "https://api.jsonbin.io/b/6282718d019db46796a15e3f",
         function (data) {
             // JSON result in `data` variable
             console.log("Community Deployer ABI: ");
