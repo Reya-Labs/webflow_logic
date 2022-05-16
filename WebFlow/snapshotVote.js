@@ -97,13 +97,13 @@ const connectWallet = async () => {
     }
 };
 
-const getTokenId = async () => {
+const getTokenId = () => {
     /// retrive the tokenId from the text field here; id = field
     const tokenId = document.getElementById("field").value;
     return tokenId;
 };
 
-const getYesVote = async () => {
+const getYesVote = () => {
     /// retrive the vote of the user from the radio buttons
     const yesVote = document.getElementById("radio").value; //  yes radio button has field id 'radio'
     return yesVote;
