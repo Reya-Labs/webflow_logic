@@ -231,15 +231,16 @@ const castVoteEthers = async (
                 try {
                     await txResponse.wait();
                     console.log("Success");
-                    const totalYesCount = await communityDeployerContract.yesVoteCount();
-                    console.log("total yes count boolean: ", totalYesCount);
-                    const totalNoCount = await communityDeployerContract.noVoteCount();
-                    console.log("total No count boolean: ", totalNoCount);
-                    // get and display the nr of yes and no votes in the poll below
-                    document.getElementById("nr-yes-votes").innerHTML =
-                        totalYesCount.toString();
-                    document.getElementById("nr-no-votes").innerHTML =
-                        totalNoCount.toString();
+                    // Below not needed anymore as it is in the voteCounter function but keeping it here in case we need it.
+                    // const totalYesCount = await communityDeployerContract.yesVoteCount();
+                    // console.log("total yes count boolean: ", totalYesCount);
+                    // const totalNoCount = await communityDeployerContract.noVoteCount();
+                    // console.log("total No count boolean: ", totalNoCount);
+                    // // get and display the nr of yes and no votes in the poll below
+                    // document.getElementById("nr-yes-votes").innerHTML =
+                    //     totalYesCount.toString();
+                    // document.getElementById("nr-no-votes").innerHTML =
+                    //     totalNoCount.toString();
 
                     //   statusElement.innerHTML = `Status: Success, number of yes votes so far is: ${totalYesCount}`; // which status element is this referring to?
                     //   console.log("Total Yes Count", totalYesCount.toString());
@@ -287,17 +288,17 @@ const castVoteWeb3 = async (
                 console.log("yes Vote boolean: ", await getYesVote());
                 console.log("account", account);
 
-
+                // Below not needed anymore as it is in the voteCounter function but keeping it here in case we need it.
                 // show the nr of yes and no votes in the poll so far
-                const totalYesCount = await communityDeployerContract.yesVoteCount();
-                console.log("total Yes count: ", totalYesCount);
-                const totalNoCount = await communityDeployerContract.noVoteCount();
-                console.log("total No count boolean: ", totalNoCount);
+                // const totalYesCount = await communityDeployerContract.yesVoteCount();
+                // console.log("total Yes count: ", totalYesCount);
+                // const totalNoCount = await communityDeployerContract.noVoteCount();
+                // console.log("total No count boolean: ", totalNoCount);
 
-                document.getElementById("nr-yes-votes").innerHTML =
-                    totalYesCount.toString();
-                document.getElementById("nr-no-votes").innerHTML =
-                    totalNoCount.toString();
+                // document.getElementById("nr-yes-votes").innerHTML =
+                //     totalYesCount.toString();
+                // document.getElementById("nr-no-votes").innerHTML =
+                //     totalNoCount.toString();
 
                 const receipt = await communityDeployerContract.methods
                     .castVote(tokenId, yesVote)
