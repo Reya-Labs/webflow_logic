@@ -196,11 +196,17 @@ const castVoteWeb3 = async (
             try {
                 const account = await web3.currentProvider.accounts[0];
                 console.log("web3.currentProvider", web3.currentProvider);
+                console.log("tokenId: ", getTokenId());
+                console.log("yes Vote boolean: ", getYesVote());
                 console.log("account", account);
+
 
                 // show the nr of yes and no votes in the poll so far
                 const totalYesCount = await communityDeployerContract.yesVoteCount();
+                console.log("total Yes count: ", totalYesCount);
                 const totalNoCount = await communityDeployerContract.noVoteCount();
+                console.log("total No count boolean: ", totalNoCount);
+
                 document.getElementById("nr-yes-votes").innerHTML =
                     totalYesCount.toString();
                 document.getElementById("nr-no-votes").innerHTML =
