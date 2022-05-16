@@ -121,12 +121,29 @@ const publishVotingEndDate = async (web3) => {
             contractABI = data.abi;
         }
     );
+    console.log("Community Deployment Contract ABI (end date function): ", contractABI);
 
     console.log('inside the publishVotingEndDate function');
-    const communityDeployerContract = new web3.eth.Contract(
-        contractABI,
-        contractAddress
-    ); // create instance of the contract to retrieve data from.
+
+    const { ethereum } = window;
+    let communityDeployerContract;
+    if (web3) {
+        communityDeployerContract = new web3.eth.Contract(
+            contractABI,
+            contractAddress
+        ); // create instance of the contract to retrieve data from.
+    } else if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        communityDeployerContract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer);
+    } else {
+        document.getElementById("voting-end-date").innerHTML = "SOON!";
+        return;
+    }
+
     console.log('after the community deployer contract instance is created');
     const endDate = await communityDeployerContract // gets the endDate for the vote
         .blockTimeStampVotingEnd()
@@ -134,6 +151,33 @@ const publishVotingEndDate = async (web3) => {
     console.log('Printing endDate: ', endDate);
     document.getElementById("voting-end-date").innerHTML = endDate; // injects the endDate into the section where it needs to be displayed
 };
+
+// const publishVotingEndDate = async (web3) => {
+//     const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
+//     let contractABI;
+
+//     await $.getJSON(
+//         "https://api.jsonbin.io/b/628273a525069545a338e71c",
+//         function (data) {
+//             // JSON result in `data` variable
+//             console.log("Community Deployer ABI: ");
+//             contractABI = data.abi;
+//         }
+//     );
+//     console.log("Community Deployment Contract ABI (end date function): ", contractABI);
+
+//     console.log('inside the publishVotingEndDate function');
+//     const communityDeployerContract = new web3.eth.Contract(
+//         contractABI,
+//         contractAddress
+//     ); // create instance of the contract to retrieve data from.
+//     console.log('after the community deployer contract instance is created');
+//     const endDate = await communityDeployerContract // gets the endDate for the vote
+//         .blockTimeStampVotingEnd()
+//         .toString();
+//     console.log('Printing endDate: ', endDate);
+//     document.getElementById("voting-end-date").innerHTML = endDate; // injects the endDate into the section where it needs to be displayed
+// };
 
 // yes and no vote as a separate function 
 
