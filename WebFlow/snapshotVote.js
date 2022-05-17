@@ -202,15 +202,30 @@ const voteCounter = async (web3) => {
     }
 
     try {
-        const totalYesCount = await communityDeployerContract.yesVoteCount();
-        console.log("total yes count boolean: ", totalYesCount);
-        const totalNoCount = await communityDeployerContract.noVoteCount();
-        console.log("total No count boolean: ", totalNoCount);
-        // get and display the nr of yes and no votes in the poll below
-        document.getElementById("nr-yes-votes").innerHTML =
-            totalYesCount.toString();
-        document.getElementById("nr-no-votes").innerHTML =
-            totalNoCount.toString();
+        if (web3) {
+            const totalYesCount = await communityDeployerContract.methods.yesVoteCount().call();
+            console.log("total yes count boolean: ", totalYesCount);
+            const totalNoCount = await communityDeployerContract.methods.noVoteCount().call();
+            console.log("total No count boolean: ", totalNoCount);
+            // get and display the nr of yes and no votes in the poll below
+            document.getElementById("nr-yes-votes").innerHTML =
+                totalYesCount.toString();
+            document.getElementById("nr-no-votes").innerHTML =
+                totalNoCount.toString();
+
+        } else {
+            const totalYesCount = await communityDeployerContract.yesVoteCount();
+            console.log("total yes count boolean: ", totalYesCount);
+            const totalNoCount = await communityDeployerContract.noVoteCount();
+            console.log("total No count boolean: ", totalNoCount);
+            // get and display the nr of yes and no votes in the poll below
+            document.getElementById("nr-yes-votes").innerHTML =
+                totalYesCount.toString();
+            document.getElementById("nr-no-votes").innerHTML =
+                totalNoCount.toString();
+
+        }
+
     } catch (error) {
         console.log(error)
     }
