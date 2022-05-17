@@ -168,7 +168,65 @@ const publishVotingEndDate = async (web3) => {
 
 };
 
-// yes and no vote as a separate function 
+const getTimeLockDate = async (web3) => {
+    const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
+    let contractABI;
+
+    await $.getJSON(
+        "https://api.jsonbin.io/b/628273a525069545a338e71c",
+        function (data) {
+            // JSON result in `data` variable
+            console.log("Community Deployer ABI inside getTimeLockDate function: ");
+            contractABI = data.abi;
+        }
+    );
+    console.log("Community Deployment Contract ABI (getTimeLock function): ", contractABI);
+
+    console.log('inside the getTimeLockDate function');
+
+    const { ethereum } = window;
+    let communityDeployerContract;
+    if (web3) {
+        communityDeployerContract = new web3.eth.Contract(
+            contractABI,
+            contractAddress
+        ); // create instance of the contract to retrieve data from.
+    } else if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        communityDeployerContract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer);
+    } else {
+        document.getElementById("timelock-period").innerHTML = "SOON!";
+        return;
+    }
+
+    if (web3) {
+        console.log('after the community deployer contract instance is created');
+        console.log('Community Deployer Contract: ', communityDeployerContract);
+        const timeLockDate = await communityDeployerContract.methods.blockTimestampVotingEnd().call();
+        console.log('Printing endDate in unix :', parseInt(timeLockDate, 16));
+        const timeLockDateObject = new Date(timeLockDate * 1000);
+        console.log("Printing the timelockDateObject date: ", timeLockDateObject);
+        console.log("Printing the timeLockDateObject in localeString", timeLockDateObject.toLocaleString())
+        document.getElementById("timelock-period").innerHTML = timeLockDateObject.toLocaleString(); // injects the endDate into the section where it needs to be displayed
+
+    } else {
+        console.log('after the community deployer contract instance is created');
+        console.log('Community Deployer Contract: ', communityDeployerContract);
+        const timeLockDate = await communityDeployerContract.blockTimestampVotingEnd();
+        console.log('Printing timeLockDate in unix :', parseInt(timeLockDate, 16));
+        const timeLockDateObject = new Date(timeLockDate * 1000);
+        console.log("Printing the timeLockDateObject date: ", timeLockDateObject);
+        console.log("Printing the timeLockDateObject in localeString", timeLockDateObject.toLocaleString())
+        document.getElementById("timelock-period").innerHTML = timeLockDateObject.toLocaleString(); // injects the endDate into the section where it needs to be displayed
+
+    }
+
+}
+
 const voteCounter = async (web3) => {
     const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
     let contractABI;
