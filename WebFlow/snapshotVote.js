@@ -143,15 +143,29 @@ const publishVotingEndDate = async (web3) => {
         document.getElementById("voting-end-date").innerHTML = "SOON!";
         return;
     }
+    if (web3) {
+        console.log('after the community deployer contract instance is created');
+        console.log('Community Deployer Contract: ', communityDeployerContract);
+        const endDate = await communityDeployerContract.methods.blockTimestampVotingEnd().call();
+        console.log('Printing endDate in unix :', parseInt(endDate, 16));
+        const dateObject = new Date(endDate * 1000);
+        console.log("Printing the dateObject date: ", dateObject);
+        console.log("Printing the dateObject in localeString", dateObject.toLocaleString())
+        document.getElementById("voting-end-date").innerHTML = dateObject.toLocaleString(); // injects the endDate into the section where it needs to be displayed
 
-    console.log('after the community deployer contract instance is created');
-    console.log('Community Deployer Contract: ', communityDeployerContract);
-    const endDate = await communityDeployerContract.blockTimestampVotingEnd();
-    console.log('Printing endDate in unix :', parseInt(endDate, 16));
-    const dateObject = new Date(endDate * 1000);
-    console.log("Printing the dateObject date: ", dateObject);
-    console.log("Printing the dateObject in localeString", dateObject.toLocaleString())
-    document.getElementById("voting-end-date").innerHTML = dateObject.toLocaleString(); // injects the endDate into the section where it needs to be displayed
+    } else {
+        console.log('after the community deployer contract instance is created');
+        console.log('Community Deployer Contract: ', communityDeployerContract);
+        const endDate = await communityDeployerContract.blockTimestampVotingEnd();
+        console.log('Printing endDate in unix :', parseInt(endDate, 16));
+        const dateObject = new Date(endDate * 1000);
+        console.log("Printing the dateObject date: ", dateObject);
+        console.log("Printing the dateObject in localeString", dateObject.toLocaleString())
+        document.getElementById("voting-end-date").innerHTML = dateObject.toLocaleString(); // injects the endDate into the section where it needs to be displayed
+
+    }
+
+
 };
 
 // yes and no vote as a separate function 
@@ -187,7 +201,6 @@ const voteCounter = async (web3) => {
         return;
     }
 
-    let txResponse;
     try {
         const totalYesCount = await communityDeployerContract.yesVoteCount();
         console.log("total yes count boolean: ", totalYesCount);
@@ -350,8 +363,6 @@ const vote = async (web3) => {
 // After the launch of the vote
 // timelock in the UI (static call from contracts)
 // todo: show the quorum in the UI (can be hardcoded actually)
-// todo: queue in the UI // after voting started
-// todo: deploy in the UI // afer voting
-// todo: verify with etherscan
-
-// for the combinatronics link you need to have the file ready and uploaded on github, then paste the github link and it creates it for you
+// todo: queue in the UI --> 2 functions one calling queue and one calling deploy function (Sol)
+// todo: deploy in the UI --> see above line (Sol)
+// todo: verify with etherscan --> artur will do that 
