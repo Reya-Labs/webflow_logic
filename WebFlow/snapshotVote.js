@@ -168,6 +168,214 @@ const publishVotingEndDate = async (web3) => {
 
 };
 
+const getDeployerEthers = async (
+    contractAddress,
+    contractABI,
+) => {
+    try {
+        const { ethereum } = window;
+        if (ethereum) {
+            const provider = new ethers.providers.Web3Provider(ethereum);
+            const signer = provider.getSigner();
+            const communityDeployerContract = new ethers.Contract(
+                contractAddress,
+                contractABI,
+                signer
+            );
+            let txResponse;
+
+            try {
+                const account = await signer.getAddress();
+                console.log("account", account);
+                txResponse = await communityDeployerContract.deploy();
+
+                try {
+                    await txResponse.wait();
+                    console.log("Success");
+
+                } catch (err) {
+                    const errorMessage = err.message;
+                    console.log(errorMessage);
+                    statusElement.innerHTML = `Status: Failed`;
+                    console.log("Voting transaction failed");
+                }
+            } catch (err) {
+                console.log("updating status element: Status Failed");
+                console.log(err.message);
+            }
+        } else {
+            console.log("Web3 object doesn't exist!");
+        }
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+const getDeployerWeb3 = async (
+    // how to get the tokenID information from the input field on the form?
+    web3,
+    contractAddress,
+    contractABI,
+
+) => {
+    statusElement.innerHTML = `Status: Pending`;
+    try {
+        if (web3) {
+            console.log("web3", web3);
+
+            const communityDeployerContract = new web3.eth.Contract(
+                contractABI,
+                contractAddress
+            );
+            console.log(communityDeployerContract);
+
+            try {
+                const account = await web3.currentProvider.accounts[0];
+                console.log("web3.currentProvider", web3.currentProvider);
+                console.log("account", account);
+
+                const receipt = await communityDeployerContract.methods.deploy().call();
+                console.log(receipt);
+                statusElement.innerHTML = `Status: Success`;
+            } catch (error) {
+                console.log("updating status element: Status Failed");
+                console.log(error.message);
+            }
+        } else {
+            console.log("Web3 object doesn't exist!");
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const deploy = async (web3) => {
+
+    const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
+
+    let contractABI;
+
+    await $.getJSON(
+        "https://api.jsonbin.io/b/628273a525069545a338e71c",
+        function (data) {
+            // JSON result in `data` variable
+            console.log("Community Deployer ABI: ");
+            contractABI = data.abi;
+        }
+    );
+    console.log(contractABI);
+
+    if (web3) {
+        getDeployerWeb3(web3, contractAddress, contractABI);
+    } else {
+        getDeployerEthers(contractAddress, contractABI);
+    }
+};
+
+const getQEthers = async (
+    contractAddress,
+    contractABI,
+) => {
+    try {
+        const { ethereum } = window;
+        if (ethereum) {
+            const provider = new ethers.providers.Web3Provider(ethereum);
+            const signer = provider.getSigner();
+            const communityDeployerContract = new ethers.Contract(
+                contractAddress,
+                contractABI,
+                signer
+            );
+            let txResponse;
+
+            try {
+                const account = await signer.getAddress();
+                console.log("account", account);
+                txResponse = await communityDeployerContract.queue();
+
+                try {
+                    await txResponse.wait();
+                    console.log("Success");
+
+                } catch (err) {
+                    const errorMessage = err.message;
+                    console.log(errorMessage);
+                    statusElement.innerHTML = `Status: Failed`;
+                    console.log("Voting transaction failed");
+                }
+            } catch (err) {
+                console.log("updating status element: Status Failed");
+                console.log(err.message);
+            }
+        } else {
+            console.log("Web3 object doesn't exist!");
+        }
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+const getQWeb3 = async (
+    // how to get the tokenID information from the input field on the form?
+    web3,
+    contractAddress,
+    contractABI,
+
+) => {
+    statusElement.innerHTML = `Status: Pending`;
+    try {
+        if (web3) {
+            console.log("web3", web3);
+
+            const communityDeployerContract = new web3.eth.Contract(
+                contractABI,
+                contractAddress
+            );
+            console.log(communityDeployerContract);
+
+            try {
+                const account = await web3.currentProvider.accounts[0];
+                console.log("web3.currentProvider", web3.currentProvider);
+                console.log("account", account);
+
+                const receipt = await communityDeployerContract.methods.queue().call();
+                console.log(receipt);
+                statusElement.innerHTML = `Status: Success`;
+            } catch (error) {
+                console.log("updating status element: Status Failed");
+                console.log(error.message);
+            }
+        } else {
+            console.log("Web3 object doesn't exist!");
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+const queue = async (web3) => {
+
+    const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
+
+    let contractABI;
+
+    await $.getJSON(
+        "https://api.jsonbin.io/b/628273a525069545a338e71c",
+        function (data) {
+            // JSON result in `data` variable
+            console.log("Community Deployer ABI: ");
+            contractABI = data.abi;
+        }
+    );
+    console.log(contractABI);
+
+    if (web3) {
+        getQWeb3(web3, contractAddress, contractABI);
+    } else {
+        getQEthers(contractAddress, contractABI);
+    }
+};
+
 const getTimeLockDate = async (web3) => {
     const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
     let contractABI;
@@ -206,7 +414,7 @@ const getTimeLockDate = async (web3) => {
     if (web3) {
         console.log('after the community deployer contract instance is created');
         console.log('Community Deployer Contract: ', communityDeployerContract);
-        const timeLockDate = await communityDeployerContract.methods.blockTimestampVotingEnd().call();
+        const timeLockDate = await communityDeployerContract.methods.blockTimestampTimelockEnd().call();
         console.log('Printing endDate in unix :', parseInt(timeLockDate, 16));
         const timeLockDateObject = new Date(timeLockDate * 1000);
         console.log("Printing the timelockDateObject date: ", timeLockDateObject);
@@ -216,12 +424,12 @@ const getTimeLockDate = async (web3) => {
     } else {
         console.log('after the community deployer contract instance is created');
         console.log('Community Deployer Contract: ', communityDeployerContract);
-        const timeLockDate = await communityDeployerContract.blockTimestampVotingEnd();
+        const timeLockDate = await communityDeployerContract.blockTimestampTimelockEnd();
         console.log('Printing timeLockDate in unix :', parseInt(timeLockDate, 16));
         const timeLockDateObject = new Date(timeLockDate * 1000);
         console.log("Printing the timeLockDateObject date: ", timeLockDateObject);
         console.log("Printing the timeLockDateObject in localeString", timeLockDateObject.toLocaleString())
-        document.getElementById("timelock-period").innerHTML = timeLockDateObject.toLocaleString(); // injects the endDate into the section where it needs to be displayed
+        document.getElementById("timelock-period").innerHTML = timeLockDateObject.toLocaleString(); // injects the timeLockDate into the section where it needs to be displayed
 
     }
 
