@@ -286,7 +286,6 @@ const voteCounter = async (web3) => {
 const castVoteEthers = async (
     contractAddress,
     contractABI,
-    tokenId,
     yesVote
 ) => {
     try {
@@ -300,6 +299,8 @@ const castVoteEthers = async (
                 signer
             );
             let txResponse;
+
+            ethSubmit.innerHTML = "VOTING";
 
             try {
                 const account = await signer.getAddress();
@@ -347,11 +348,9 @@ const castVoteEthers = async (
 };
 
 const castVoteWeb3 = async (
-    // how to get the tokenID information from the input field on the form?
     web3,
     contractAddress,
     contractABI,
-    tokenId,
     yesVote
 ) => {
     statusElement.innerHTML = `Status: Pending`;
@@ -426,22 +425,17 @@ const vote = async (web3) => {
             contractABI = data.abi;
         }
     );
-    console.log(contractABI);
 
     if (web3) {
-        castVoteWeb3(web3, contractAddress, contractABI, tokenId, yesVote);
+        castVoteWeb3(web3, contractAddress, contractABI, yesVote);
     } else {
-        castVoteEthers(contractAddress, contractABI, tokenId, yesVote);
+        castVoteEthers(contractAddress, contractABI, yesVote);
     }
 };
 
-// todo: cast vote in the UI
-// todo: show the total yes/no votes in the UI (static call in react) give ID
-// todo: show end timestamps for voting (static call from contract) give ID
 
 // After the launch of the vote
 // timelock in the UI (static call from contracts)
-// todo: show the quorum in the UI (can be hardcoded actually)
 // todo: queue in the UI --> 2 functions one calling queue and one calling deploy function (Sol)
 // todo: deploy in the UI --> see above line (Sol)
-// todo: verify with etherscan --> artur will do that 
+// todo: verify with etherscan --> artur will do that
