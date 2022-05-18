@@ -312,6 +312,10 @@ const castVoteEthers = async (
                 console.log("tokenId: ", await getTokenId());
                 console.log("yes Vote boolean: ", await getYesVote());
                 console.log("account", account);
+
+
+
+
                 txResponse = await communityDeployerContract.castVote(tokenId, yesVote);
 
                 try {
@@ -405,7 +409,7 @@ const castVoteWeb3 = async (
 
 const vote = async (web3) => {
     // change this to the mainnet adddress of the NFT contract
-    const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
+    const contractAddress = "0x9ff64338E09F46708Af86d72Dc9F0E226B07a279";
 
     let contractABI;
 
