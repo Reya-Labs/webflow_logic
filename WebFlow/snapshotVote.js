@@ -114,7 +114,7 @@ const publishVotingEndDate = async (web3) => {
     let contractABI;
 
     await $.getJSON(
-        "https://api.jsonbin.io/b/628273a525069545a338e71c",
+        "https://api.jsonbin.io/b/628527b525069545a33c4b81",
         function (data) {
             // JSON result in `data` variable
             console.log("Community Deployer ABI: ");
@@ -173,7 +173,7 @@ const getTimeLockDate = async (web3) => {
     let contractABI;
 
     await $.getJSON(
-        "https://api.jsonbin.io/b/628273a525069545a338e71c",
+        "https://api.jsonbin.io/b/628527b525069545a33c4b81",
         function (data) {
             // JSON result in `data` variable
             console.log("Community Deployer ABI inside getTimeLockDate function: ");
@@ -232,7 +232,7 @@ const voteCounter = async (web3) => {
     let contractABI;
 
     await $.getJSON(
-        "https://api.jsonbin.io/b/628273a525069545a338e71c",
+        "https://api.jsonbin.io/b/628527b525069545a33c4b81",
         function (data) {
             // JSON result in `data` variable
             console.log("Community Deployer ABI: ");
@@ -417,7 +417,7 @@ const vote = async (web3) => {
     const yesVote = getYesVote();
 
     await $.getJSON(
-        "https://api.jsonbin.io/b/628273a525069545a338e71c",
+        "https://api.jsonbin.io/b/628527b525069545a33c4b81",
         function (data) {
             // JSON result in `data` variable
             console.log("Community Deployer ABI: ");
