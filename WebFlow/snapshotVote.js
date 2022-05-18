@@ -325,18 +325,18 @@ const castVoteEthers = async (
                     );
                     try {
                         await txResponse.wait();
+                        ethSubmit.innerHTML = "VOTE SUCCEEDED";
                         console.log("Success");
                     } catch (err) {
-                        const errorMessage = err.message;
-                        console.log(errorMessage);
-                        statusElement.innerHTML = `Status: Failed`;
-                        console.log("Voting transaction failed");
+                        console.log(err.message);
+                        ethSubmit.innerHTML = "UNABLE TO VOTE";
                     }
                 }
 
             } catch (err) {
                 console.log("updating status element: Status Failed");
                 console.log(err.message);
+                ethSubmit.innerHTML = "UNABLE TO VOTE";
             }
         } else {
             console.log("Web3 object doesn't exist!");
