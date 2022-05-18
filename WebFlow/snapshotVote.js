@@ -323,32 +323,24 @@ const castVoteEthers = async (
                 );
 
                 console.log("votersJSON: ", votersJSON);
-                console.log("data for account", votersJSON[account]);
-
-                txResponse = await communityDeployerContract.castVote(tokenId, yesVote);
-
-                try {
-                    await txResponse.wait();
-                    console.log("Success");
-                    // Below not needed anymore as it is in the voteCounter function but keeping it here in case we need it.
-                    // const totalYesCount = await communityDeployerContract.yesVoteCount();
-                    // console.log("total yes count boolean: ", totalYesCount);
-                    // const totalNoCount = await communityDeployerContract.noVoteCount();
-                    // console.log("total No count boolean: ", totalNoCount);
-                    // // get and display the nr of yes and no votes in the poll below
-                    // document.getElementById("nr-yes-votes").innerHTML =
-                    //     totalYesCount.toString();
-                    // document.getElementById("nr-no-votes").innerHTML =
-                    //     totalNoCount.toString();
-
-                    //   statusElement.innerHTML = `Status: Success, number of yes votes so far is: ${totalYesCount}`; // which status element is this referring to?
-                    //   console.log("Total Yes Count", totalYesCount.toString());
-                } catch (err) {
-                    const errorMessage = err.message;
-                    console.log(errorMessage);
-                    statusElement.innerHTML = `Status: Failed`;
-                    console.log("Voting transaction failed");
+                if (votersJSON[account]) {
+                    txResponse = await communityDeployerContract.castVote(
+                        votersJSON[account]['index'],
+                        votersJSON[account]['amount'],
+                        yesVote,
+                        votersJSON[account]['proof'],
+                    );
+                    try {
+                        await txResponse.wait();
+                        console.log("Success");
+                    } catch (err) {
+                        const errorMessage = err.message;
+                        console.log(errorMessage);
+                        statusElement.innerHTML = `Status: Failed`;
+                        console.log("Voting transaction failed");
+                    }
                 }
+
             } catch (err) {
                 console.log("updating status element: Status Failed");
                 console.log(err.message);
@@ -387,23 +379,33 @@ const castVoteWeb3 = async (
                 console.log("yes Vote boolean: ", await getYesVote());
                 console.log("account", account);
 
-                // Below not needed anymore as it is in the voteCounter function but keeping it here in case we need it.
-                // show the nr of yes and no votes in the poll so far
-                // const totalYesCount = await communityDeployerContract.yesVoteCount();
-                // console.log("total Yes count: ", totalYesCount);
-                // const totalNoCount = await communityDeployerContract.noVoteCount();
-                // console.log("total No count boolean: ", totalNoCount);
+                
+                let votersJSON;
+                
+                await $.getJSON(
+                    "https://api.npoint.io/e8e70e3f412defc543f4",
+                    function (data) {
+                        votersJSON = data;
+                    }
+                );
 
-                // document.getElementById("nr-yes-votes").innerHTML =
-                //     totalYesCount.toString();
-                // document.getElementById("nr-no-votes").innerHTML =
-                //     totalNoCount.toString();
+                if (votersJSON[account]) {
 
-                const receipt = await communityDeployerContract.methods
-                    .castVote(tokenId, yesVote)
+                    const receipt = await communityDeployerContract.methods
+                    .castVote(
+                        votersJSON[account]['index'],
+                        votersJSON[account]['amount'],
+                        yesVote,
+                        votersJSON[account]['proof'],
+                    )
                     .send({ from: account });
-                console.log(receipt);
-                statusElement.innerHTML = `Status: Success`;
+
+                    console.log(receipt);
+                    statusElement.innerHTML = `Status: Success`;
+                } else {
+                    console.log("account not found in the voters json");
+                }
+                
             } catch (error) {
                 console.log("updating status element: Status Failed");
                 console.log(error.message);
