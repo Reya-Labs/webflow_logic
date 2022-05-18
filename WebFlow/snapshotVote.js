@@ -97,12 +97,6 @@ const connectWallet = async () => {
     }
 };
 
-const getTokenId = async () => {
-    /// retrive the tokenId from the text field here; id = field
-    const tokenId = await document.getElementById("field").value;
-    return tokenId;
-};
-
 const getYesVote = async () => {
     /// retrive the vote of the user from the radio buttons
     const yesVote = await document.getElementById("radio").checked; //  yes radio button has field id 'radio'
@@ -309,7 +303,6 @@ const castVoteEthers = async (
 
             try {
                 const account = await signer.getAddress();
-                console.log("tokenId: ", await getTokenId());
                 console.log("yes Vote boolean: ", await getYesVote());
                 console.log("account", account);
 
@@ -375,7 +368,6 @@ const castVoteWeb3 = async (
             try {
                 const account = await web3.currentProvider.accounts[0];
                 console.log("web3.currentProvider", web3.currentProvider);
-                console.log("tokenId: ", await getTokenId());
                 console.log("yes Vote boolean: ", await getYesVote());
                 console.log("account", account);
 
@@ -424,7 +416,6 @@ const vote = async (web3) => {
 
     let contractABI;
 
-    const tokenId = getTokenId();
     const yesVote = getYesVote();
 
     await $.getJSON(
