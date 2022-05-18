@@ -332,6 +332,8 @@ const castVoteEthers = async (
                         console.log(err.message);
                         ethSubmit.innerHTML = "UNABLE TO VOTE";
                     }
+                } else {
+                    ethSubmit.innerHTML = "UNABLE TO VOTE";    
                 }
 
             } catch (err) {
