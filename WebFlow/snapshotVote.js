@@ -110,7 +110,7 @@ const getYesVote = async () => {
 };
 
 const publishVotingEndDate = async (web3) => {
-    const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
+    const contractAddress = "0x9ff64338E09F46708Af86d72Dc9F0E226B07a279";
     let contractABI;
 
     await $.getJSON(
@@ -169,7 +169,7 @@ const publishVotingEndDate = async (web3) => {
 };
 
 const getTimeLockDate = async (web3) => {
-    const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
+    const contractAddress = "0x9ff64338E09F46708Af86d72Dc9F0E226B07a279";
     let contractABI;
 
     await $.getJSON(
@@ -228,7 +228,7 @@ const getTimeLockDate = async (web3) => {
 }
 
 const voteCounter = async (web3) => {
-    const contractAddress = "0x7B90850eE5903b8f0B7448A9EbE53c6F449e1A0d";
+    const contractAddress = "0x9ff64338E09F46708Af86d72Dc9F0E226B07a279";
     let contractABI;
 
     await $.getJSON(
