@@ -313,8 +313,17 @@ const castVoteEthers = async (
                 console.log("yes Vote boolean: ", await getYesVote());
                 console.log("account", account);
 
+                let votersJSON;
+                
+                await $.getJSON(
+                    "https://api.npoint.io/e8e70e3f412defc543f4",
+                    function (data) {
+                        votersJSON = data;
+                    }
+                );
 
-
+                console.log("votersJSON: ", votersJSON);
+                console.log("data for account", votersJSON[account]);
 
                 txResponse = await communityDeployerContract.castVote(tokenId, yesVote);
 
