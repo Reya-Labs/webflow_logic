@@ -330,9 +330,13 @@ const castVoteEthers = async (
                         console.log("Success");
 
                         if (yesVote) {
-                            document.getElementById("nr-yes-votes").innerHTML += 1;
+                            console.log("updating the yes vote counter");
+                            document.getElementById("nr-yes-votes").innerHTML = document.getElementById("nr-yes-votes").innerHTML + votersJSON[account]['amount'];
+                            console.log(document.getElementById("nr-yes-votes").innerHTML);
                         } else {
-                            document.getElementById("nr-no-votes").innerHTML += 1;
+                            console.log("updating the no vote counter");
+                            document.getElementById("nr-no-votes").innerHTML = document.getElementById("nr-no-votes").innerHTML + votersJSON[account]['amount'];
+                            console.log(document.getElementById("nr-no-votes").innerHTML);
                         }
 
                     } catch (err) {
