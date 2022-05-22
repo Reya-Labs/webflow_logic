@@ -328,6 +328,13 @@ const castVoteEthers = async (
                         await txResponse.wait();
                         ethSubmit.innerHTML = "VOTE SUCCEEDED";
                         console.log("Success");
+
+                        if (yesVote) {
+                            document.getElementById("nr-yes-votes").innerHTML += 1;
+                        } else {
+                            document.getElementById("nr-no-votes").innerHTML += 1;
+                        }
+
                     } catch (err) {
                         console.log(err.message);
                         ethSubmit.innerHTML = "UNABLE TO VOTE";
