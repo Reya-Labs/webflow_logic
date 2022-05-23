@@ -329,15 +329,16 @@ const castVoteEthers = async (
                         ethSubmit.innerHTML = "VOTE SUCCEEDED";
                         console.log("Success");
 
-                        if (yesVote) {
-                            console.log("updating the yes vote counter");
-                            document.getElementById("nr-yes-votes").innerHTML = document.getElementById("nr-yes-votes").innerHTML + votersJSON[account]['amount'];
-                            console.log(document.getElementById("nr-yes-votes").innerHTML);
-                        } else {
-                            console.log("updating the no vote counter");
-                            document.getElementById("nr-no-votes").innerHTML = document.getElementById("nr-no-votes").innerHTML + votersJSON[account]['amount'];
-                            console.log(document.getElementById("nr-no-votes").innerHTML);
-                        }
+                        // if (yesVote) {
+                        //     console.log("updating the yes vote counter");
+                        //     document.getElementById("nr-yes-votes").innerHTML = document.getElementById("nr-yes-votes").innerHTML + votersJSON[account]['amount'];
+                        //     console.log(document.getElementById("nr-yes-votes").innerHTML);
+                        // } else {
+                        //     console.log("updating the no vote counter");
+                        //     document.getElementById("nr-no-votes").innerHTML = document.getElementById("nr-no-votes").innerHTML + votersJSON[account]['amount'];
+                        //     console.log(document.getElementById("nr-no-votes").innerHTML);
+                        // }
+                        await voteCounter(web3);
 
                     } catch (err) {
                         console.log(err.message);
@@ -405,6 +406,9 @@ const castVoteWeb3 = async (
                     .send({ from: account });
 
                     console.log(receipt);
+                    walletConnect.innerHTML = "VOTE SUCCEEDED";
+                    await voteCounter(web3);
+
                     statusElement.innerHTML = `Status: Success`;
                 } else {
                     console.log("account not found in the voters json");
