@@ -104,7 +104,7 @@ const getYesVote = async () => {
 };
 
 const publishVotingEndDate = async (web3) => {
-    const contractAddress = "0xFa9DDF4569206625370D2A8546f42c1CC924063c";
+    const contractAddress = "0x36E3d9E6f22D9E02039FA6ec1CD073216E4D3E8C";
     let contractABI;
 
     await $.getJSON(
@@ -163,7 +163,7 @@ const publishVotingEndDate = async (web3) => {
 };
 
 const getTimeLockDate = async (web3) => {
-    const contractAddress = "0xFa9DDF4569206625370D2A8546f42c1CC924063c";
+    const contractAddress = "0x36E3d9E6f22D9E02039FA6ec1CD073216E4D3E8C";
     let contractABI;
 
     await $.getJSON(
@@ -222,7 +222,7 @@ const getTimeLockDate = async (web3) => {
 }
 
 const voteCounter = async (web3) => {
-    const contractAddress = "0xFa9DDF4569206625370D2A8546f42c1CC924063c";
+    const contractAddress = "0x36E3d9E6f22D9E02039FA6ec1CD073216E4D3E8C";
     let contractABI;
 
     await $.getJSON(
@@ -424,7 +424,7 @@ const castVoteWeb3 = async (
 
 const vote = async (web3) => {
     // change this to the mainnet adddress of the NFT contract
-    const contractAddress = "0xFa9DDF4569206625370D2A8546f42c1CC924063c";
+    const contractAddress = "0x36E3d9E6f22D9E02039FA6ec1CD073216E4D3E8C";
 
     let contractABI;
 
