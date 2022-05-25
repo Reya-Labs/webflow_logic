@@ -283,6 +283,50 @@ const voteCounter = async (web3) => {
     }
 }
 
+
+const queueEthers = async (
+    contractAddress,
+    contractABI,
+) => {
+    try {
+        const { ethereum } = window;
+        if (ethereum) {
+            const provider = new ethers.providers.Web3Provider(ethereum);
+            const signer = provider.getSigner();
+            const communityDeployerContract = new ethers.Contract(
+                contractAddress,
+                contractABI,
+                signer
+            );
+            let txResponse;
+
+            ethSubmit.innerHTML = "QUEUEING";
+
+            try {
+                
+                txResponse = await communityDeployerContract.queue();
+
+                try {
+                    await txResponse.wait();
+                    ethSubmit.innerHTML = "SUCCESSFULLY QUEUED";
+                } catch (err) {
+                    ethSubmit.innerHTML = "ALREADY QUEUED";
+                }
+            }
+            catch (err) {
+                ethSubmit.innerHTML = "ALREADY QUEUED";
+            }
+            
+        } else {
+            console.log("Web3 object doesn't exist!");
+        }
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+
+
 const castVoteEthers = async (
     contractAddress,
     contractABI,
@@ -449,6 +493,26 @@ const vote = async (web3) => {
         castVoteEthers(contractAddress, contractABI, yesVote);
     }
 };
+
+
+const queue = async (web3) => {
+    // change this to the mainnet adddress of the NFT contract
+    const contractAddress = "0x36E3d9E6f22D9E02039FA6ec1CD073216E4D3E8C";
+
+    let contractABI;
+
+    await $.getJSON(
+        "https://api.jsonbin.io/b/628527b525069545a33c4b81",
+        function (data) {
+            // JSON result in `data` variable
+            console.log("Community Deployer ABI: ");
+            contractABI = data.abi;
+        }
+    );
+
+    await queueEthers(contractAddress, contractABI);
+};
+
 
 
 // After the launch of the vote
