@@ -17,22 +17,24 @@ const updateRates = async(pools) => {
     });
 
     await $.getJSON(POOL_ADDRESSES_JSON_URL, function (data) {
-        poolAddresses = data;
+        poolAddresses = data.record;
         console.log("Pool addresses:", poolAddresses);
     });
 
     await $.getJSON(MARGIN_ENGINE_JSON_URL, function (data) {
-        marginEngineABI = data;
+        marginEngineABI = data.record;
         console.log("margin engine ABI:", marginEngineABI);
     });
 
     await $.getJSON(VAMM_JSON_URL, function (data) {
-        vammABI = data;
+        vammABI = data.record;
         console.log("vamm ABI:", vammABI);
     });
 
     for (let pool in pools) {
+        console.log("pool:", pool);
         const poolInfo = poolAddresses[pool];
+        console.log("poolInfo:", poolInfo);
 
         const marginEngineContract = new ethers.Contract(
             marginEngineABI,
