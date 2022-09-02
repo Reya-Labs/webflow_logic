@@ -185,6 +185,21 @@ const getPoolAddresses = async () => {
 }
 
 const updateRates = async (pool, poolAddresses) => {
+
+    if (!ethereum) {
+        document.getElementById(`${pool}_fixed_rate`).innerHTML = "-";
+        document.getElementById(`${pool}_fixed_rate_2`).innerHTML = "-";
+        document.getElementById(`${pool}_fixed_rate_3`).innerHTML = "-";
+        document.getElementById(`${pool}_fixed_rate_4`).innerHTML = "-";
+
+        document.getElementById(`${pool}_variable_rate`).innerHTML = "-";
+        document.getElementById(`${pool}_variable_rate_2`).innerHTML = "-";
+        document.getElementById(`${pool}_variable_rate_3`).innerHTML = "-";
+        document.getElementById(`${pool}_variable_rate_4`).innerHTML = "-";
+
+        return;
+    }
+
     const provider = new ethers.providers.Web3Provider(ethereum);
 
     console.log("provider", provider);
