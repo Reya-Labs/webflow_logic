@@ -157,8 +157,8 @@ const AAVE_LENDING_POOL_ABI = {
 
 const CTOKEN_ABI = {
     "abi": [
-        {"constant":true,"inputs":[],"name":"borrowRatePerBlock","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},
-        {"constant":true,"inputs":[],"name":"supplyRatePerBlock","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}
+        { "constant": true, "inputs": [], "name": "borrowRatePerBlock", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" },
+        { "constant": true, "inputs": [], "name": "supplyRatePerBlock", "outputs": [{ "name": "", "type": "uint256" }], "payable": false, "stateMutability": "view", "type": "function" }
     ]
 }
 
@@ -166,11 +166,7 @@ const daysPerYear = 365;
 const blocksPerDay = 6570; // 13.15 seconds per block
 const blocksPerHour = 274;
 
-const updateRates = async (pools) => {
-    const provider = new ethers.providers.Web3Provider(ethereum);
-
-    console.log("provider", provider);
-
+const getPoolAddresses = async () => {
     // LOAD POOL ADDRESSES
 
     await $.ajaxSetup({
@@ -185,241 +181,197 @@ const updateRates = async (pools) => {
         console.log("Pool addresses:", poolAddresses);
     });
 
-    // let marginEngineABI;
-    // await $.getJSON(MARGIN_ENGINE_JSON_URL, function (data) {
-    //     marginEngineABI = data.record.abi;
-    //     console.log("margin engine ABI:", marginEngineABI);
-    // });
+    return poolAddresses;
+}
 
-    // let vammABI;
-    // await $.getJSON(VAMM_JSON_URL, function (data) {
-    //     vammABI = data.record.abi;
-    //     console.log("vamm ABI:", vammABI);
-    // });
+const updateRates = async (pool, poolAddresses) => {
+    const provider = new ethers.providers.Web3Provider(ethereum);
 
-    // let aaveRateOracleABI;
-    // await $.getJSON(AAVE_RATE_ORACLE_JSON_URL, function (data) {
-    //     aaveRateOracleABI = data.record.abi;
-    //     console.log("aave ro ABI:", aaveRateOracleABI);
-    // });
+    console.log("provider", provider);
 
-    // let aaveLendingPoolABI;
-    // await $.getJSON(AAVE_LENDING_POOL_JSON_URL, function (data) {
-    //     aaveLendingPoolABI = data.record.abi;
-    //     console.log("aave lending pool ABI:", aaveLendingPoolABI);
-    // });
+    console.log("pool:", pool);
+    const poolInfo = poolAddresses[pool];
+    console.log("poolInfo:", poolInfo);
 
-    // let compoundRateOracleABI;
-    // await $.getJSON(COMPOUND_RATE_ORACLE_JSON_URL, function (data) {
-    //     compoundRateOracleABI = data.record.abi;
-    //     console.log("compound ro ABI:", compoundRateOracleABI);
-    // });
+    const marginEngineAddress = poolInfo.marginEngine;
+    console.log("margin engine address:", marginEngineAddress);
 
-    // let cTokenABI;
-    // await $.getJSON(CTOKEN_JSON_URL, function (data) {
-    //     cTokenABI = data.record.abi;
-    //     console.log("cToken ABI:", cTokenABI);
-    // });
+    const marginEngineContract = new ethers.Contract(
+        marginEngineAddress,
+        MARGIN_ENGINE_ABI.abi,
+        provider
+    );
 
-    // let lidoRateOracleABI;
-    // await $.getJSON(LIDO_RATE_ORACLE_JSON_URL, function (data) {
-    //     lidoRateOracleABI = data.record.abi;
-    //     console.log("lido ro ABI:", lidoRateOracleABI);
-    // });
+    console.log("margin engine contract:", marginEngineContract);
 
-    // let rocketRateOracleABI;
-    // await $.getJSON(ROCKET_RATE_ORACLE_JSON_URL, function (data) {
-    //     rocketRateOracleABI = data.record.abi;
-    //     console.log("rocket ro ABI:", rocketRateOracleABI);
-    // });
+    const vammAddress = await marginEngineContract.vamm();
+    console.log("vamm address:", vammAddress);
 
-    // iterate through pools and get rates
+    const vammContract = new ethers.Contract(
+        vammAddress,
+        VAMM_ABI.abi,
+        provider
+    );
 
-    for (let pool of pools) {
-        console.log("pool:", pool);
-        const poolInfo = poolAddresses[pool];
-        console.log("poolInfo:", poolInfo);
+    console.log("vamm contract:", vammContract);
 
-        const marginEngineAddress = poolInfo.marginEngine;
-        console.log("margin engine address:", marginEngineAddress);
+    const vammVars = await vammContract.vammVars();
+    console.log("vamm vars:", vammVars);
 
-        const marginEngineContract = new ethers.Contract(
-            marginEngineAddress,
-            MARGIN_ENGINE_ABI.abi,
-            provider
-        );
+    const tick = vammVars[1];
+    console.log("vamm tick:", tick);
 
-        console.log("margin engine contract:", marginEngineContract);
+    const fixedRate = 1.0001 ** (-tick);
+    console.log("fixed rate:", fixedRate);
 
-        const vammAddress = await marginEngineContract.vamm();
-        console.log("vamm address:", vammAddress);
+    document.getElementById(`${pool}_fixed_rate`).innerHTML = fixedRate.toFixed(2) + "%";
 
-        const vammContract = new ethers.Contract(
-            vammAddress,
-            VAMM_ABI.abi,
-            provider
-        );
+    const rateOracleAddress = await marginEngineContract.rateOracle();
+    console.log("rate oracle address:", rateOracleAddress);
 
-        console.log("vamm contract:", vammContract);
+    switch (poolInfo.rateOracleID) {
+        case 1: {
+            const underlyingTokenAddress = await marginEngineContract.underlyingToken();
+            console.log("underlying address:", underlyingTokenAddress);
 
-        const vammVars = await vammContract.vammVars();
-        console.log("vamm vars:", vammVars);
+            const rateOracleContract = new ethers.Contract(
+                rateOracleAddress,
+                RATE_ORACLE_ABI.abi,
+                provider
+            );
 
-        const tick = vammVars[1];
-        console.log("vamm tick:", tick);
+            const lendingPoolAddress = await rateOracleContract.aaveLendingPool();
+            console.log("lending pool address:", lendingPoolAddress);
 
-        const fixedRate = 1.0001 ** (-tick);
-        console.log("fixed rate:", fixedRate);
+            const lendingPoolContract = new ethers.Contract(
+                lendingPoolAddress,
+                AAVE_LENDING_POOL_ABI.abi,
+                provider
+            );
 
-        document.getElementById(`${pool}_fixed_rate`).innerHTML = fixedRate.toFixed(2) + "%";
+            const reservesData = await lendingPoolContract.getReserveData(underlyingTokenAddress);
+            console.log("reserves data:", reservesData);
 
-        const rateOracleAddress = await marginEngineContract.rateOracle();
-        console.log("rate oracle address:", rateOracleAddress);
+            const rateInRay = reservesData.currentLiquidityRate;
+            const variableRate = Number(ethers.utils.formatUnits(rateInRay, 27));
 
-        switch (poolInfo.rateOracleID) {
-            case 1: {
-                const underlyingTokenAddress = await marginEngineContract.underlyingToken();
-                console.log("underlying address:", underlyingTokenAddress);
+            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            break;
+        }
+        case 2: {
+            const rateOracleContract = new ethers.Contract(
+                rateOracleAddress,
+                RATE_ORACLE_ABI.abi,
+                provider
+            );
 
-                const rateOracleContract = new ethers.Contract(
-                    rateOracleAddress,
-                    RATE_ORACLE_ABI.abi,
-                    provider
-                );
+            const cTokenAddress = await rateOracleContract.ctoken();
+            console.log("cToken address:", cTokenAddress);
 
-                const lendingPoolAddress = await rateOracleContract.aaveLendingPool();
-                console.log("lending pool address:", lendingPoolAddress);
+            const cTokenContract = new ethers.Contract(
+                cTokenAddress,
+                CTOKEN_ABI.abi,
+                provider
+            );
 
-                const lendingPoolContract = new ethers.Contract(
-                    lendingPoolAddress,
-                    AAVE_LENDING_POOL_ABI.abi,
-                    provider
-                );
+            const supplyRatePerBlock = await cTokenContract.supplyRatePerBlock();
+            console.log("supply rate per block:", supplyRatePerBlock);
 
-                const reservesData = await lendingPoolContract.getReserveData(underlyingTokenAddress);
-                console.log("reserves data:", reservesData);
+            const variableRate = (((Math.pow((Number(ethers.utils.formatUnits(supplyRatePerBlock, 18)) * blocksPerDay) + 1, daysPerYear))) - 1);
 
-                const rateInRay = reservesData.currentLiquidityRate;
-                const variableRate = Number(ethers.utils.formatUnits(rateInRay, 27));
+            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            break;
+        }
+        case 3: {
+            const lastBlock = await provider.getBlockNumber();
+            const to = (await provider.getBlock(lastBlock - 1)).timestamp;
+            const from = (await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp;
 
-                document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
-                break;
-            }
-            case 2: {
-                const rateOracleContract = new ethers.Contract(
-                    rateOracleAddress,
-                    RATE_ORACLE_ABI.abi,
-                    provider
-                );
+            const rateOracleContract = new ethers.Contract(
+                rateOracleAddress,
+                RATE_ORACLE_ABI.abi,
+                provider
+            );
 
-                const cTokenAddress = await rateOracleContract.ctoken();
-                console.log("cToken address:", cTokenAddress);
+            const oneWeekApy = await rateOracleContract.getApyFromTo(from, to);
 
-                const cTokenContract = new ethers.Contract(
-                    cTokenAddress,
-                    CTOKEN_ABI.abi,
-                    provider
-                );
+            const variableRate = ethers.utils.formatUnits(oneWeekApy, 18);
 
-                const supplyRatePerBlock = await cTokenContract.supplyRatePerBlock();
-                console.log("supply rate per block:", supplyRatePerBlock);
+            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            break;
+        }
+        case 4: {
+            const lastBlock = await provider.getBlockNumber();
+            const to = (await provider.getBlock(lastBlock - 1)).timestamp;
+            const from = (await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp;
 
-                const variableRate = (((Math.pow((Number(ethers.utils.formatUnits(supplyRatePerBlock, 18)) * blocksPerDay) + 1, daysPerYear))) - 1);
+            const rateOracleContract = new ethers.Contract(
+                rateOracleAddress,
+                RATE_ORACLE_ABI.abi,
+                provider
+            );
 
-                document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
-                break;
-            }
-            case 3: {
-                const lastBlock = await provider.getBlockNumber();
-                const to = (await provider.getBlock(lastBlock - 1)).timestamp;
-                const from = (await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp;
+            const oneWeekApy = await rateOracleContract.getApyFromTo(from, to);
 
-                const rateOracleContract = new ethers.Contract(
-                    rateOracleAddress,
-                    RATE_ORACLE_ABI.abi,
-                    provider
-                );
+            const variableRate = ethers.utils.formatUnits(oneWeekApy, 18);
 
-                const oneWeekApy = await rateOracleContract.getApyFromTo(from, to);
+            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            break;
+        }
+        case 5: {
+            const underlyingTokenAddress = await marginEngineContract.underlyingToken();
+            console.log("underlying address:", underlyingTokenAddress);
 
-                const variableRate = ethers.utils.formatUnits(oneWeekApy, 18);
+            const rateOracleContract = new ethers.Contract(
+                rateOracleAddress,
+                RATE_ORACLE_ABI.abi,
+                provider
+            );
 
-                document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
-                break;
-            }
-            case 4: {
-                const lastBlock = await provider.getBlockNumber();
-                const to = (await provider.getBlock(lastBlock - 1)).timestamp;
-                const from = (await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp;
+            const lendingPoolAddress = await rateOracleContract.aaveLendingPool();
+            console.log("lending pool address:", lendingPoolAddress);
 
-                const rateOracleContract = new ethers.Contract(
-                    rateOracleAddress,
-                    RATE_ORACLE_ABI.abi,
-                    provider
-                );
+            const lendingPoolContract = new ethers.Contract(
+                lendingPoolAddress,
+                AAVE_LENDING_POOL_ABI.abi,
+                provider
+            );
 
-                const oneWeekApy = await rateOracleContract.getApyFromTo(from, to);
+            const reservesData = await lendingPoolContract.getReserveData(underlyingTokenAddress);
+            console.log("reserves data:", reservesData);
 
-                const variableRate = ethers.utils.formatUnits(oneWeekApy, 18);
+            const rateInRay = reservesData.currentVariableBorrowRate;
+            const variableRate = Number(ethers.utils.formatUnits(rateInRay, 27));
 
-                document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
-                break;
-            }
-            case 5: {
-                const underlyingTokenAddress = await marginEngineContract.underlyingToken();
-                console.log("underlying address:", underlyingTokenAddress);
+            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            break;
+        }
+        case 6: {
+            const rateOracleContract = new ethers.Contract(
+                rateOracleAddress,
+                RATE_ORACLE_ABI.abi,
+                provider
+            );
 
-                const rateOracleContract = new ethers.Contract(
-                    rateOracleAddress,
-                    RATE_ORACLE_ABI.abi,
-                    provider
-                );
+            const cTokenAddress = await rateOracleContract.ctoken();
+            console.log("cToken address:", cTokenAddress);
 
-                const lendingPoolAddress = await rateOracleContract.aaveLendingPool();
-                console.log("lending pool address:", lendingPoolAddress);
+            const cTokenContract = new ethers.Contract(
+                cTokenAddress,
+                CTOKEN_ABI.abi,
+                provider
+            );
 
-                const lendingPoolContract = new ethers.Contract(
-                    lendingPoolAddress,
-                    AAVE_LENDING_POOL_ABI.abi,
-                    provider
-                );
+            const borrowRatePerBlock = await cTokenContract.borrowRatePerBlock();
+            console.log("borrow rate:", borrowRatePerBlock);
 
-                const reservesData = await lendingPoolContract.getReserveData(underlyingTokenAddress);
-                console.log("reserves data:", reservesData);
+            const variableRate = (((Math.pow((Number(ethers.utils.formatUnits(borrowRatePerBlock, 18)) * blocksPerDay) + 1, daysPerYear))) - 1);
 
-                const rateInRay = reservesData.currentVariableBorrowRate;
-                const variableRate = Number(ethers.utils.formatUnits(rateInRay, 27));
-
-                document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
-                break;
-            }
-            case 6: {
-                const rateOracleContract = new ethers.Contract(
-                    rateOracleAddress,
-                    RATE_ORACLE_ABI.abi,
-                    provider
-                );
-
-                const cTokenAddress = await rateOracleContract.ctoken();
-                console.log("cToken address:", cTokenAddress);
-
-                const cTokenContract = new ethers.Contract(
-                    cTokenAddress,
-                    CTOKEN_ABI.abi,
-                    provider
-                );
-
-                const borrowRatePerBlock = await cTokenContract.borrowRatePerBlock();
-                console.log("borrow rate:", borrowRatePerBlock);
-
-                const variableRate = (((Math.pow((Number(ethers.utils.formatUnits(borrowRatePerBlock, 18)) * blocksPerDay) + 1, daysPerYear))) - 1);
-
-                document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
-                break;
-            }
-            default: {
-                document.getElementById(`${pool}_variable_rate`).innerHTML = "-";
-            }
+            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            break;
+        }
+        default: {
+            document.getElementById(`${pool}_variable_rate`).innerHTML = "-";
         }
     }
 }
