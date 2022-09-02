@@ -5,7 +5,11 @@ const POOL_ADDRESSES_JSON_URL = "https://api.jsonbin.io/v3/b/6311eaeae13e6063dc9
 const MARGIN_ENGINE_JSON_URL = "https://api.jsonbin.io/v3/b/6311ea005c146d63ca8b68ed";
 const VAMM_JSON_URL = "https://api.jsonbin.io/v3/b/6311ea28a1610e63861b13a3";
 
-const updateRates = async(pools) => {    
+const updateRates = async(pools) => { 
+    const provider = new ethers.providers.Web3Provider(ethereum);
+
+    console.log("provider", provider);
+
     let marginEngineABI;
     let vammABI;
     let poolAddresses;
@@ -41,7 +45,8 @@ const updateRates = async(pools) => {
 
         const marginEngineContract = new ethers.Contract(
             marginEngineAddress,
-            marginEngineABI
+            marginEngineABI,
+            provider
         );
 
         console.log("margin engine contract:", marginEngineContract);
@@ -51,7 +56,8 @@ const updateRates = async(pools) => {
 
         const vammContract = new ethers.Contract(
             marginEngineAddress,
-            marginEngineABI
+            marginEngineABI,
+            provider
         );
 
         console.log("vamm contract:", vammContract);
