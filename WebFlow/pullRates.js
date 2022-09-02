@@ -22,12 +22,12 @@ const updateRates = async(pools) => {
     });
 
     await $.getJSON(MARGIN_ENGINE_JSON_URL, function (data) {
-        marginEngineABI = data.record;
+        marginEngineABI = data.record.abi;
         console.log("margin engine ABI:", marginEngineABI);
     });
 
     await $.getJSON(VAMM_JSON_URL, function (data) {
-        vammABI = data.record;
+        vammABI = data.record.abi;
         console.log("vamm ABI:", vammABI);
     });
 
