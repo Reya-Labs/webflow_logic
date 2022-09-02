@@ -44,7 +44,9 @@ const updateRates = async(pools) => {
             marginEngineABI
         );
 
-        const vammAddress = await marginEngineContract.vamm();
+        console.log("margin engine contract:", marginEngineContract);
+
+        const vammAddress = await marginEngineContract.callStatic.vamm();
         console.log("vamm address:", vammAddress);
 
         const vammContract = new ethers.Contract(
@@ -52,7 +54,12 @@ const updateRates = async(pools) => {
             marginEngineABI
         );
 
-        const tick = (await vammContract.vammVars())[1];
+        console.log("vamm contract:", vammContract);
+
+        const vammVars = await vammContract.callStatic.vammVars();
+        console.log("vamm vars:", vammVars);
+
+        const tick = vammVars[1];
         console.log("vamm tick:", tick);
 
         const fixedRate = 1.0001 ** (-tick);
