@@ -5,7 +5,11 @@ const POOL_ADDRESSES_JSON_URL = "https://api.jsonbin.io/v3/b/6311eaeae13e6063dc9
 const MARGIN_ENGINE_JSON_URL = "https://api.jsonbin.io/v3/b/6311ea005c146d63ca8b68ed";
 const VAMM_JSON_URL = "https://api.jsonbin.io/v3/b/6311ea28a1610e63861b13a3";
 
-const getFixedRate = async (web3, pool) => {
+const updateRates = async(web3, pools) => {
+    if (!web3) {
+        return;
+    }
+
     console.log("window", window);
     
     let marginEngineABI;
@@ -33,7 +37,7 @@ const getFixedRate = async (web3, pool) => {
         console.log("vamm ABI:", vammABI);
     });
 
-    if (web3) {
+    for (let pool in pools) {
         const poolInfo = poolAddresses[pool];
 
         const marginEngineContract = new web3.eth.Contract(
@@ -55,10 +59,8 @@ const getFixedRate = async (web3, pool) => {
         const fixedRate = 1.0001 ** (-tick);
         console.log("fixedRate:", fixedRate);
 
-        return fixedRate.toFixed(2) + "%";
-    }
-    else {
-        return "-";
+        document.getElementById(`${pool}_fixed_rate`).innerHTML = fixedRate.toFixed(2) + "%";
+        document.getElementById(`${pool}_variable_rate`).innerHTML = "x%";
     }
 }
 
