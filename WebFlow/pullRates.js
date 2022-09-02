@@ -36,17 +36,20 @@ const updateRates = async(pools) => {
         const poolInfo = poolAddresses[pool];
         console.log("poolInfo:", poolInfo);
 
+        const marginEngineAddress = poolInfo.marginEngine;
+        console.log("margin engine address:", marginEngineAddress);
+
         const marginEngineContract = new ethers.Contract(
-            marginEngineABI,
-            poolInfo.marginEngine
+            marginEngineAddress,
+            marginEngineABI
         );
 
         const vammAddress = await marginEngineContract.vamm();
         console.log("vamm address:", vammAddress);
 
         const vammContract = new ethers.Contract(
-            marginEngineABI,
-            marginEngineAddress
+            marginEngineAddress,
+            marginEngineABI
         );
 
         const tick = (await vammContract.vammVars())[1];
