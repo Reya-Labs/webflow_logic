@@ -20,45 +20,146 @@ const ROCKET_RATE_ORACLE_JSON_URL = "https://api.jsonbin.io/v3/b/63124ce45c146d6
 const MARGIN_ENGINE_ABI = {
     "abi": [
         {
-          "inputs": [],
-          "name": "rateOracle",
-          "outputs": [
-            {
-              "internalType": "contract IRateOracle",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
+            "inputs": [],
+            "name": "rateOracle",
+            "outputs": [
+                {
+                    "internalType": "contract IRateOracle",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
         },
         {
-          "inputs": [],
-          "name": "underlyingToken",
-          "outputs": [
-            {
-              "internalType": "contract IERC20Minimal",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
+            "inputs": [],
+            "name": "underlyingToken",
+            "outputs": [
+                {
+                    "internalType": "contract IERC20Minimal",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
         },
         {
-          "inputs": [],
-          "name": "vamm",
-          "outputs": [
-            {
-              "internalType": "contract IVAMM",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
+            "inputs": [],
+            "name": "vamm",
+            "outputs": [
+                {
+                    "internalType": "contract IVAMM",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
         }
-      ]
+    ]
+}
+
+const VAMM_ABI = {
+    "abi": [
+        {
+            "inputs": [],
+            "name": "vammVars",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "uint160",
+                            "name": "sqrtPriceX96",
+                            "type": "uint160"
+                        },
+                        {
+                            "internalType": "int24",
+                            "name": "tick",
+                            "type": "int24"
+                        },
+                        {
+                            "internalType": "uint8",
+                            "name": "feeProtocol",
+                            "type": "uint8"
+                        }
+                    ],
+                    "internalType": "struct IVAMM.VAMMVars",
+                    "name": "",
+                    "type": "tuple"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ]
+}
+
+const RATE_ORACLE_ABI = {
+    "abi": [
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "from",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "to",
+                    "type": "uint256"
+                }
+            ],
+            "name": "getApyFromTo",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "apyFromToWad",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "ctoken",
+            "outputs": [
+                {
+                    "internalType": "contract ICToken",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "aaveLendingPool",
+            "outputs": [
+                {
+                    "internalType": "contract IAaveV2LendingPool",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ]
+}
+
+const AAVE_LENDING_POOL_ABI = {
+    "abi": [{ "inputs": [{ "internalType": "address", "name": "asset", "type": "address" }], "name": "getReserveData", "outputs": [{ "components": [{ "components": [{ "internalType": "uint256", "name": "data", "type": "uint256" }], "internalType": "struct DataTypes.ReserveConfigurationMap", "name": "configuration", "type": "tuple" }, { "internalType": "uint128", "name": "liquidityIndex", "type": "uint128" }, { "internalType": "uint128", "name": "variableBorrowIndex", "type": "uint128" }, { "internalType": "uint128", "name": "currentLiquidityRate", "type": "uint128" }, { "internalType": "uint128", "name": "currentVariableBorrowRate", "type": "uint128" }, { "internalType": "uint128", "name": "currentStableBorrowRate", "type": "uint128" }, { "internalType": "uint40", "name": "lastUpdateTimestamp", "type": "uint40" }, { "internalType": "address", "name": "aTokenAddress", "type": "address" }, { "internalType": "address", "name": "stableDebtTokenAddress", "type": "address" }, { "internalType": "address", "name": "variableDebtTokenAddress", "type": "address" }, { "internalType": "address", "name": "interestRateStrategyAddress", "type": "address" }, { "internalType": "uint8", "name": "id", "type": "uint8" }], "internalType": "struct DataTypes.ReserveData", "name": "", "type": "tuple" }], "stateMutability": "view", "type": "function" }]
+}
+
+const CTOKEN_ABI = {
+    "abi": [
+        {"constant":true,"inputs":[],"name":"borrowRatePerBlock","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},
+        {"constant":true,"inputs":[],"name":"supplyRatePerBlock","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}
+    ]
 }
 
 const daysPerYear = 365;
@@ -70,7 +171,7 @@ const updateRates = async (pools) => {
 
     console.log("provider", provider);
 
-    // LOAD ABIs
+    // LOAD POOL ADDRESSES
 
     await $.ajaxSetup({
         headers: {
@@ -90,48 +191,48 @@ const updateRates = async (pools) => {
     //     console.log("margin engine ABI:", marginEngineABI);
     // });
 
-    let vammABI;
-    await $.getJSON(VAMM_JSON_URL, function (data) {
-        vammABI = data.record.abi;
-        console.log("vamm ABI:", vammABI);
-    });
+    // let vammABI;
+    // await $.getJSON(VAMM_JSON_URL, function (data) {
+    //     vammABI = data.record.abi;
+    //     console.log("vamm ABI:", vammABI);
+    // });
 
-    let aaveRateOracleABI;
-    await $.getJSON(AAVE_RATE_ORACLE_JSON_URL, function (data) {
-        aaveRateOracleABI = data.record.abi;
-        console.log("aave ro ABI:", aaveRateOracleABI);
-    });
+    // let aaveRateOracleABI;
+    // await $.getJSON(AAVE_RATE_ORACLE_JSON_URL, function (data) {
+    //     aaveRateOracleABI = data.record.abi;
+    //     console.log("aave ro ABI:", aaveRateOracleABI);
+    // });
 
-    let aaveLendingPoolABI;
-    await $.getJSON(AAVE_LENDING_POOL_JSON_URL, function (data) {
-        aaveLendingPoolABI = data.record.abi;
-        console.log("aave lending pool ABI:", aaveLendingPoolABI);
-    });
+    // let aaveLendingPoolABI;
+    // await $.getJSON(AAVE_LENDING_POOL_JSON_URL, function (data) {
+    //     aaveLendingPoolABI = data.record.abi;
+    //     console.log("aave lending pool ABI:", aaveLendingPoolABI);
+    // });
 
-    let compoundRateOracleABI;
-    await $.getJSON(COMPOUND_RATE_ORACLE_JSON_URL, function (data) {
-        compoundRateOracleABI = data.record.abi;
-        console.log("compound ro ABI:", compoundRateOracleABI);
-    });
+    // let compoundRateOracleABI;
+    // await $.getJSON(COMPOUND_RATE_ORACLE_JSON_URL, function (data) {
+    //     compoundRateOracleABI = data.record.abi;
+    //     console.log("compound ro ABI:", compoundRateOracleABI);
+    // });
 
-    let cTokenABI;
-    await $.getJSON(CTOKEN_JSON_URL, function (data) {
-        cTokenABI = data.record.abi;
-        console.log("cToken ABI:", cTokenABI);
-    });
+    // let cTokenABI;
+    // await $.getJSON(CTOKEN_JSON_URL, function (data) {
+    //     cTokenABI = data.record.abi;
+    //     console.log("cToken ABI:", cTokenABI);
+    // });
 
-    let lidoRateOracleABI;
-    await $.getJSON(LIDO_RATE_ORACLE_JSON_URL, function (data) {
-        lidoRateOracleABI = data.record.abi;
-        console.log("lido ro ABI:", lidoRateOracleABI);
-    });
+    // let lidoRateOracleABI;
+    // await $.getJSON(LIDO_RATE_ORACLE_JSON_URL, function (data) {
+    //     lidoRateOracleABI = data.record.abi;
+    //     console.log("lido ro ABI:", lidoRateOracleABI);
+    // });
 
-    let rocketRateOracleABI;
-    await $.getJSON(ROCKET_RATE_ORACLE_JSON_URL, function (data) {
-        rocketRateOracleABI = data.record.abi;
-        console.log("rocket ro ABI:", rocketRateOracleABI);
-    });
-    
+    // let rocketRateOracleABI;
+    // await $.getJSON(ROCKET_RATE_ORACLE_JSON_URL, function (data) {
+    //     rocketRateOracleABI = data.record.abi;
+    //     console.log("rocket ro ABI:", rocketRateOracleABI);
+    // });
+
     // iterate through pools and get rates
 
     for (let pool of pools) {
@@ -155,7 +256,7 @@ const updateRates = async (pools) => {
 
         const vammContract = new ethers.Contract(
             vammAddress,
-            vammABI,
+            VAMM_ABI.abi,
             provider
         );
 
@@ -182,7 +283,7 @@ const updateRates = async (pools) => {
 
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
-                    aaveRateOracleABI,
+                    RATE_ORACLE_ABI.abi,
                     provider
                 );
 
@@ -191,7 +292,7 @@ const updateRates = async (pools) => {
 
                 const lendingPoolContract = new ethers.Contract(
                     lendingPoolAddress,
-                    aaveLendingPoolABI,
+                    AAVE_LENDING_POOL_ABI.abi,
                     provider
                 );
 
@@ -207,7 +308,7 @@ const updateRates = async (pools) => {
             case 2: {
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
-                    compoundRateOracleABI,
+                    RATE_ORACLE_ABI.abi,
                     provider
                 );
 
@@ -216,7 +317,7 @@ const updateRates = async (pools) => {
 
                 const cTokenContract = new ethers.Contract(
                     cTokenAddress,
-                    cTokenABI,
+                    CTOKEN_ABI.ab,
                     provider
                 );
 
@@ -235,7 +336,7 @@ const updateRates = async (pools) => {
 
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
-                    lidoRateOracleABI,
+                    RATE_ORACLE_ABI.abi,
                     provider
                 );
 
@@ -253,7 +354,7 @@ const updateRates = async (pools) => {
 
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
-                    rocketRateOracleABI,
+                    RATE_ORACLE_ABI.abi,
                     provider
                 );
 
@@ -270,7 +371,7 @@ const updateRates = async (pools) => {
 
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
-                    aaveRateOracleABI,
+                    RATE_ORACLE_ABI.abi,
                     provider
                 );
 
@@ -279,7 +380,7 @@ const updateRates = async (pools) => {
 
                 const lendingPoolContract = new ethers.Contract(
                     lendingPoolAddress,
-                    aaveLendingPoolABI,
+                    AAVE_LENDING_POOL_ABI.abi,
                     provider
                 );
 
@@ -295,7 +396,7 @@ const updateRates = async (pools) => {
             case 6: {
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
-                    compoundRateOracleABI,
+                    RATE_ORACLE_ABI.abi,
                     provider
                 );
 
@@ -304,7 +405,7 @@ const updateRates = async (pools) => {
 
                 const cTokenContract = new ethers.Contract(
                     cTokenAddress,
-                    cTokenABI,
+                    CTOKEN_ABI.abi,
                     provider
                 );
 
