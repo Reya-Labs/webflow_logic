@@ -317,7 +317,7 @@ const updateRates = async (pools) => {
 
                 const cTokenContract = new ethers.Contract(
                     cTokenAddress,
-                    CTOKEN_ABI.ab,
+                    CTOKEN_ABI.abi,
                     provider
                 );
 
