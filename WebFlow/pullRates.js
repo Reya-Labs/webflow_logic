@@ -225,10 +225,14 @@ const updateRates = async (pool, poolAddresses) => {
     console.log("fixed rate:", fixedRate);
 
     document.getElementById(`${pool}_fixed_rate`).innerHTML = fixedRate.toFixed(2) + "%";
+    document.getElementById(`${pool}_fixed_rate_2`).innerHTML = fixedRate.toFixed(2) + "%";
+    document.getElementById(`${pool}_fixed_rate_3`).innerHTML = fixedRate.toFixed(2) + "%";
+    document.getElementById(`${pool}_fixed_rate_4`).innerHTML = fixedRate.toFixed(2) + "%";
 
     const rateOracleAddress = await marginEngineContract.rateOracle();
     console.log("rate oracle address:", rateOracleAddress);
 
+    let variableRateString;
     switch (poolInfo.rateOracleID) {
         case 1: {
             const underlyingTokenAddress = await marginEngineContract.underlyingToken();
@@ -255,7 +259,7 @@ const updateRates = async (pool, poolAddresses) => {
             const rateInRay = reservesData.currentLiquidityRate;
             const variableRate = Number(ethers.utils.formatUnits(rateInRay, 27));
 
-            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            variableRateString = (variableRate * 100).toFixed(2) + "%";
             break;
         }
         case 2: {
@@ -279,7 +283,7 @@ const updateRates = async (pool, poolAddresses) => {
 
             const variableRate = (((Math.pow((Number(ethers.utils.formatUnits(supplyRatePerBlock, 18)) * blocksPerDay) + 1, daysPerYear))) - 1);
 
-            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            variableRateString = (variableRate * 100).toFixed(2) + "%";
             break;
         }
         case 3: {
@@ -297,7 +301,7 @@ const updateRates = async (pool, poolAddresses) => {
 
             const variableRate = ethers.utils.formatUnits(oneWeekApy, 18);
 
-            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            variableRateString = (variableRate * 100).toFixed(2) + "%";
             break;
         }
         case 4: {
@@ -315,7 +319,7 @@ const updateRates = async (pool, poolAddresses) => {
 
             const variableRate = ethers.utils.formatUnits(oneWeekApy, 18);
 
-            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            variableRateString = (variableRate * 100).toFixed(2) + "%";
             break;
         }
         case 5: {
@@ -343,7 +347,7 @@ const updateRates = async (pool, poolAddresses) => {
             const rateInRay = reservesData.currentVariableBorrowRate;
             const variableRate = Number(ethers.utils.formatUnits(rateInRay, 27));
 
-            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            variableRateString = (variableRate * 100).toFixed(2) + "%";
             break;
         }
         case 6: {
@@ -367,12 +371,17 @@ const updateRates = async (pool, poolAddresses) => {
 
             const variableRate = (((Math.pow((Number(ethers.utils.formatUnits(borrowRatePerBlock, 18)) * blocksPerDay) + 1, daysPerYear))) - 1);
 
-            document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+            variableRateString = (variableRate * 100).toFixed(2) + "%";
             break;
         }
         default: {
-            document.getElementById(`${pool}_variable_rate`).innerHTML = "-";
+            variableRateString = "-";
         }
     }
+    
+    document.getElementById(`${pool}_variable_rate`).innerHTML = variableRateString;
+    document.getElementById(`${pool}_variable_rate_2`).innerHTML = variableRateString;
+    document.getElementById(`${pool}_variable_rate_3`).innerHTML = variableRateString;
+    document.getElementById(`${pool}_variable_rate_4`).innerHTML = variableRateString;
 }
 
