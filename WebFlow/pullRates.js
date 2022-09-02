@@ -185,6 +185,7 @@ const getPoolAddresses = async () => {
 }
 
 const updateRates = async (pool, poolAddresses) => {
+    const { ethereum } = window;
 
     if (!ethereum) {
         document.getElementById(`${pool}_fixed_rate`).innerHTML = "-";
