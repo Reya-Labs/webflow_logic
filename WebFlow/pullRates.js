@@ -154,9 +154,9 @@ const updateRates = async (pools) => {
                 console.log("reserves data:", reservesData);
 
                 const rateInRay = reservesData.currentLiquidityRate;
-                const variableRate = Number(ethers.utils.formatUnits(rateInRay, 25));
+                const variableRate = Number(ethers.utils.formatUnits(rateInRay, 27));
 
-                document.getElementById(`${pool}_variable_rate`).innerHTML = variableRate.toFixed(2) + "%";
+                document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
                 break;
             }
             case 2: {
@@ -185,8 +185,8 @@ const updateRates = async (pools) => {
             }
             case 3: {
                 const lastBlock = await provider.getBlockNumber();
-                const to = BigNumber.from((await provider.getBlock(lastBlock - 1)).timestamp);
-                const from = BigNumber.from((await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp);
+                const to = (await provider.getBlock(lastBlock - 1)).timestamp;
+                const from = (await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp;
 
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
@@ -196,15 +196,15 @@ const updateRates = async (pools) => {
 
                 const oneWeekApy = await rateOracleContract.getApyFromTo(from, to);
 
-                const variableRate = oneWeekApy.div(BigNumber.from(1000000000000)).toNumber() / 1000000;
+                const variableRate = ethers.utils.formatUnits(oneWeekApy, 18);
 
                 document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
                 break;
             }
             case 4: {
                 const lastBlock = await provider.getBlockNumber();
-                const to = BigNumber.from((await provider.getBlock(lastBlock - 1)).timestamp);
-                const from = BigNumber.from((await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp);
+                const to = (await provider.getBlock(lastBlock - 1)).timestamp;
+                const from = (await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp;
 
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
@@ -214,7 +214,7 @@ const updateRates = async (pools) => {
 
                 const oneWeekApy = await rateOracleContract.getApyFromTo(from, to);
 
-                const variableRate = oneWeekApy.div(BigNumber.from(1000000000000)).toNumber() / 1000000;
+                const variableRate = ethers.utils.formatUnits(oneWeekApy, 18);
 
                 document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
                 break;
@@ -242,7 +242,7 @@ const updateRates = async (pools) => {
                 console.log("reserves data:", reservesData);
 
                 const rateInRay = reservesData.currentVariableBorrowRate;
-                const variableRate = rateInRay.div(BigNumber.from(10).pow(21)).toNumber() / 1000000;
+                const variableRate = Number(ethers.utils.formatUnits(rateInRay, 27));
 
                 document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
                 break;
@@ -266,7 +266,7 @@ const updateRates = async (pools) => {
                 const borrowRatePerBlock = await cTokenContract.borrowRatePerBlock();
                 console.log("borrow rate:", borrowRatePerBlock);
 
-                const variableRate = (((Math.pow((borrowRatePerBlock.toNumber() / 1e18 * blocksPerDay) + 1, daysPerYear))) - 1);
+                const variableRate = (((Math.pow((Number(ethers.utils.formatUnits(borrowRatePerBlock, 18)) * blocksPerDay) + 1, daysPerYear))) - 1);
 
                 document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
                 break;
