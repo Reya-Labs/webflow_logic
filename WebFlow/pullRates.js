@@ -31,7 +31,7 @@ const updateRates = async(pools) => {
         console.log("vamm ABI:", vammABI);
     });
 
-    for (let pool in pools) {
+    for (let pool of pools) {
         console.log("pool:", pool);
         const poolInfo = poolAddresses[pool];
         console.log("poolInfo:", poolInfo);
