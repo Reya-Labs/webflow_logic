@@ -16,6 +16,51 @@ const LIDO_RATE_ORACLE_JSON_URL = "https://api.jsonbin.io/v3/b/63124ccc5c146d63c
 
 const ROCKET_RATE_ORACLE_JSON_URL = "https://api.jsonbin.io/v3/b/63124ce45c146d63ca8bd785";
 
+
+const MARGIN_ENGINE_ABI = {
+    "abi": [
+        {
+          "inputs": [],
+          "name": "rateOracle",
+          "outputs": [
+            {
+              "internalType": "contract IRateOracle",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "underlyingToken",
+          "outputs": [
+            {
+              "internalType": "contract IERC20Minimal",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "vamm",
+          "outputs": [
+            {
+              "internalType": "contract IVAMM",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ]
+}
+
 const daysPerYear = 365;
 const blocksPerDay = 6570; // 13.15 seconds per block
 const blocksPerHour = 274;
@@ -39,11 +84,11 @@ const updateRates = async (pools) => {
         console.log("Pool addresses:", poolAddresses);
     });
 
-    let marginEngineABI;
-    await $.getJSON(MARGIN_ENGINE_JSON_URL, function (data) {
-        marginEngineABI = data.record.abi;
-        console.log("margin engine ABI:", marginEngineABI);
-    });
+    // let marginEngineABI;
+    // await $.getJSON(MARGIN_ENGINE_JSON_URL, function (data) {
+    //     marginEngineABI = data.record.abi;
+    //     console.log("margin engine ABI:", marginEngineABI);
+    // });
 
     let vammABI;
     await $.getJSON(VAMM_JSON_URL, function (data) {
@@ -99,7 +144,7 @@ const updateRates = async (pools) => {
 
         const marginEngineContract = new ethers.Contract(
             marginEngineAddress,
-            marginEngineABI,
+            MARGIN_ENGINE_ABI,
             provider
         );
 
