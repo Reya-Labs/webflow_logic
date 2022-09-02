@@ -16,6 +16,10 @@ const LIDO_RATE_ORACLE_JSON_URL = "https://api.jsonbin.io/v3/b/63124ccc5c146d63c
 
 const ROCKET_RATE_ORACLE_JSON_URL = "https://api.jsonbin.io/v3/b/63124ce45c146d63ca8bd785";
 
+const daysPerYear = 365;
+const blocksPerDay = 6570; // 13.15 seconds per block
+const blocksPerHour = 274;
+
 const updateRates = async (pools) => {
     const provider = new ethers.providers.Web3Provider(ethereum);
 
@@ -156,8 +160,6 @@ const updateRates = async (pools) => {
                 break;
             }
             case 2: {
-
-
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
                     compoundRateOracleABI,
@@ -176,7 +178,7 @@ const updateRates = async (pools) => {
                 const supplyRatePerBlock = await cTokenContract.supplyRatePerBlock();
                 console.log("supply rate per block:", supplyRatePerBlock);
 
-                const variableRate = (((Math.pow((supplyRatePerBlock.toNumber() / 1e18 * blocksPerDay) + 1, 365))) - 1);
+                const variableRate = (((Math.pow((supplyRatePerBlock.toNumber() / 1e18 * blocksPerDay) + 1, daysPerYear))) - 1);
 
                 document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
                 break;
@@ -184,7 +186,7 @@ const updateRates = async (pools) => {
             case 3: {
                 const lastBlock = await provider.getBlockNumber();
                 const to = BigNumber.from((await provider.getBlock(lastBlock - 1)).timestamp);
-                const from = BigNumber.from((await provider.getBlock(lastBlock - 28 * blockPerHour)).timestamp);
+                const from = BigNumber.from((await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp);
 
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
@@ -202,7 +204,7 @@ const updateRates = async (pools) => {
             case 4: {
                 const lastBlock = await provider.getBlockNumber();
                 const to = BigNumber.from((await provider.getBlock(lastBlock - 1)).timestamp);
-                const from = BigNumber.from((await provider.getBlock(lastBlock - 28 * blockPerHour)).timestamp);
+                const from = BigNumber.from((await provider.getBlock(lastBlock - 28 * blocksPerHour)).timestamp);
 
                 const rateOracleContract = new ethers.Contract(
                     rateOracleAddress,
@@ -264,7 +266,7 @@ const updateRates = async (pools) => {
                 const borrowRatePerBlock = await cTokenContract.borrowRatePerBlock();
                 console.log("borrow rate:", borrowRatePerBlock);
 
-                const variableRate = (((Math.pow((borrowRatePerBlock.toNumber() / 1e18 * blocksPerDay) + 1, 365))) - 1);
+                const variableRate = (((Math.pow((borrowRatePerBlock.toNumber() / 1e18 * blocksPerDay) + 1, daysPerYear))) - 1);
 
                 document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
                 break;
