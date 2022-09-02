@@ -144,7 +144,7 @@ const updateRates = async (pools) => {
 
         const marginEngineContract = new ethers.Contract(
             marginEngineAddress,
-            MARGIN_ENGINE_ABI,
+            MARGIN_ENGINE_ABI.abi,
             provider
         );
 
