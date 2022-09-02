@@ -5,13 +5,7 @@ const POOL_ADDRESSES_JSON_URL = "https://api.jsonbin.io/v3/b/6311eaeae13e6063dc9
 const MARGIN_ENGINE_JSON_URL = "https://api.jsonbin.io/v3/b/6311ea005c146d63ca8b68ed";
 const VAMM_JSON_URL = "https://api.jsonbin.io/v3/b/6311ea28a1610e63861b13a3";
 
-const updateRates = async(web3, pools) => {
-    if (!web3) {
-        return;
-    }
-
-    console.log("window", window);
-    
+const updateRates = async(pools) => {    
     let marginEngineABI;
     let vammABI;
     let poolAddresses;
@@ -40,7 +34,7 @@ const updateRates = async(web3, pools) => {
     for (let pool in pools) {
         const poolInfo = poolAddresses[pool];
 
-        const marginEngineContract = new web3.eth.Contract(
+        const marginEngineContract = new ethers.Contract(
             marginEngineABI,
             poolInfo.marginEngine
         );
@@ -48,7 +42,7 @@ const updateRates = async(web3, pools) => {
         const vammAddress = await marginEngineContract.vamm();
         console.log("vamm address:", vammAddress);
 
-        const vammContract = new web3.eth.Contract(
+        const vammContract = new ethers.Contract(
             marginEngineABI,
             marginEngineAddress
         );
