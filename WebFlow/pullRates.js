@@ -154,9 +154,9 @@ const updateRates = async (pools) => {
                 console.log("reserves data:", reservesData);
 
                 const rateInRay = reservesData.currentLiquidityRate;
-                const variableRate = rateInRay.div(BigNumber.from(10).pow(21)).toNumber() / 1000000;
+                const variableRate = Number(ethers.utils.formatUnits(rateInRay, 25));
 
-                document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
+                document.getElementById(`${pool}_variable_rate`).innerHTML = variableRate.toFixed(2) + "%";
                 break;
             }
             case 2: {
@@ -178,7 +178,7 @@ const updateRates = async (pools) => {
                 const supplyRatePerBlock = await cTokenContract.supplyRatePerBlock();
                 console.log("supply rate per block:", supplyRatePerBlock);
 
-                const variableRate = (((Math.pow((supplyRatePerBlock.toNumber() / 1e18 * blocksPerDay) + 1, daysPerYear))) - 1);
+                const variableRate = (((Math.pow((Number(ethers.utils.formatUnits(supplyRatePerBlock, 18)) * blocksPerDay) + 1, daysPerYear))) - 1);
 
                 document.getElementById(`${pool}_variable_rate`).innerHTML = (variableRate * 100).toFixed(2) + "%";
                 break;
