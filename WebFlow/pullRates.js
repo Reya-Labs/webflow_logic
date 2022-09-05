@@ -1,22 +1,3 @@
-
-const READ_ACCESS_KEY = '$2b$10$SEZhOctEjFSSELyoTt3YReAC1UwE6eAlgJVMwltKH3k0dpgaweBz6';
-
-const POOL_ADDRESSES_JSON_URL = "https://api.jsonbin.io/v3/b/6311eaeae13e6063dc97f3b4";
-
-const MARGIN_ENGINE_JSON_URL = "https://api.jsonbin.io/v3/b/6311ea005c146d63ca8b68ed";
-const VAMM_JSON_URL = "https://api.jsonbin.io/v3/b/6311ea28a1610e63861b13a3";
-
-const AAVE_RATE_ORACLE_JSON_URL = "https://api.jsonbin.io/v3/b/63124c90a1610e63861b80af";
-const AAVE_LENDING_POOL_JSON_URL = "https://api.jsonbin.io/v3/b/63124c64e13e6063dc9860ea";
-
-const COMPOUND_RATE_ORACLE_JSON_URL = "https://api.jsonbin.io/v3/b/63124cb1a1610e63861b80d2";
-const CTOKEN_JSON_URL = "https://api.jsonbin.io/v3/b/63124c1fe13e6063dc98609c";
-
-const LIDO_RATE_ORACLE_JSON_URL = "https://api.jsonbin.io/v3/b/63124ccc5c146d63ca8bd76a";
-
-const ROCKET_RATE_ORACLE_JSON_URL = "https://api.jsonbin.io/v3/b/63124ce45c146d63ca8bd785";
-
-
 const MARGIN_ENGINE_ABI = {
     "abi": [
         {
@@ -165,24 +146,6 @@ const CTOKEN_ABI = {
 const daysPerYear = 365;
 const blocksPerDay = 6570; // 13.15 seconds per block
 const blocksPerHour = 274;
-
-const getPoolAddresses = async () => {
-    // LOAD POOL ADDRESSES
-
-    await $.ajaxSetup({
-        headers: {
-            'X-ACCESS-KEY': READ_ACCESS_KEY
-        }
-    });
-
-    let poolAddresses;
-    await $.getJSON(POOL_ADDRESSES_JSON_URL, function (data) {
-        poolAddresses = data.record;
-        console.log("Pool addresses:", poolAddresses);
-    });
-
-    return poolAddresses;
-}
 
 const updateRates = async (pool, poolAddresses) => {
     const { ethereum } = window;
