@@ -147,24 +147,8 @@ const daysPerYear = 365;
 const blocksPerDay = 6570; // 13.15 seconds per block
 const blocksPerHour = 274;
 
-const updateRates = async (pool, poolAddresses) => {
-    const { ethereum } = window;
-
-    if (!ethereum) {
-        document.getElementById(`${pool}_fixed_rate`).innerHTML = "-";
-        document.getElementById(`${pool}_fixed_rate_2`).innerHTML = "-";
-        document.getElementById(`${pool}_fixed_rate_3`).innerHTML = "-";
-        document.getElementById(`${pool}_fixed_rate_4`).innerHTML = "-";
-
-        document.getElementById(`${pool}_variable_rate`).innerHTML = "-";
-        document.getElementById(`${pool}_variable_rate_2`).innerHTML = "-";
-        document.getElementById(`${pool}_variable_rate_3`).innerHTML = "-";
-        document.getElementById(`${pool}_variable_rate_4`).innerHTML = "-";
-
-        return;
-    }
-
-    const provider = new ethers.providers.Web3Provider(ethereum);
+const updateRates = async (pool, poolAddresses, provider_url) => {
+    const provider = new ethers.providers.JsonRpcProvider(provider_url);
 
     console.log("provider", provider);
 
