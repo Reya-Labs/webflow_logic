@@ -96,19 +96,19 @@ const connectWalletConnect = async () => {
 const handleUserConnection = () => {
     console.log("handle user connection", isConnectedMetamask, isConnectedWalletConnect);
     if (isConnectedMetamask || isConnectedWalletConnect) {
-        buttonMetamask.hidden = true;
-        buttonWalletConnect.hidden = true;
-        buttonVoteYes.hidden = false;
-        buttonVoteNo.hidden = false;
+        buttonMetamask.style.visibility = 'hidden'
+        buttonWalletConnect.style.visibility = 'hidden'
+        buttonVoteYes.style.visibility = 'visible'
+        buttonVoteNo.style.visibility = 'visible'
     } else {
-        buttonMetamask.hidden = false;
-        buttonWalletConnect.hidden = false;
-        buttonVoteYes.hidden = true;
-        buttonVoteNo.hidden = true;
+        buttonMetamask.style.visibility = 'visible'
+        buttonWalletConnect.style.visibility = 'visible'
+        buttonVoteYes.style.visibility = 'hidden'
+        buttonVoteNo.style.visibility = 'hidden'
     }
 
-    buttonQueue.hidden = true;
-    buttonDeploy.hidden = true;
+    buttonQueue.style.visibility = 'hidden'
+    buttonDeploy.style.visibility = 'hidden'
 }
 
 

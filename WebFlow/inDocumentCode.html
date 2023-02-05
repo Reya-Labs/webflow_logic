@@ -1,4 +1,7 @@
 <script>
+
+const communityDeployerAddress = "0xFa9DDF4569206625370D2A8546f42c1CC924063c";
+
 // get a reference to the status box
 const buttonMetamask = document.getElementById("button-metamask");
 const buttonWalletConnect = document.getElementById("button-wallet-connect");
@@ -6,6 +9,8 @@ const buttonVoteYes = document.getElementById("button-vote-yes");
 const buttonVoteNo = document.getElementById("button-vote-no");
 const buttonQueue = document.getElementById("button-queue");
 const buttonDeploy = document.getElementById("button-deploy");
+
+for (const element in [])
 
 let isConnectedMetamask; 
 let isConnectedWalletConnect;
@@ -42,13 +47,16 @@ buttonMetamask.addEventListener("click", async function () {
     handleUserConnection();
 });
 
-buttonWalletConnect.addEventListener("click", async function () {
-    if (!isConnectedMetamask) {
-      await connectWalletConnect();    
-      isConnectedMetamask = await checkIsConnectedWalletConnect();
+buttonVoteYes.addEventListener("click", async function () {
+    if (isConnectedMetamask || isConnectedWalletConnect) {
+      await vote(true);
     }
+});
 
-    handleUserConnection();
+buttonVoteNo.addEventListener("click", async function () {
+    if (isConnectedMetamask || isConnectedWalletConnect) {
+      await vote(false);
+    }
 });
 
 </script>
