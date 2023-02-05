@@ -7,10 +7,13 @@ const buttonVoteNo = document.getElementById("button-vote-no");
 const buttonQueue = document.getElementById("button-queue");
 const buttonDeploy = document.getElementById("button-deploy");
 
+buttonMetamask.hid
 let isConnectedMetamask; 
 let isConnectedWalletConnect;
 
 let web3;
+
+handleUserConnection();
 
 // publishVotingEndDate(web3)
 // voteCounter(web3)
@@ -20,14 +23,14 @@ let web3;
 checkIsConnectedMetamask().then(
   (isConnected) => {
     isConnectedMetamask = isConnected;
-    handleUserConnection(isConnectedMetamask, isConnectedWalletConnect);
+    handleUserConnection();
   }
 )
 
 checkIsConnectedWalletConnect().then(
   (isConnected) => {
     isConnectedWalletConnect = isConnected;
-    handleUserConnection(isConnectedMetamask, isConnectedWalletConnect);
+    handleUserConnection();
   }
 )
 
@@ -37,7 +40,7 @@ buttonMetamask.addEventListener("click", async function () {
       isConnectedMetamask = await checkIsConnectedMetamask();
     }
 
-    handleUserConnection(isConnectedMetamask, isConnectedWalletConnect);
+    handleUserConnection();
 });
 
 buttonWalletConnect.addEventListener("click", async function () {
@@ -46,7 +49,7 @@ buttonWalletConnect.addEventListener("click", async function () {
       isConnectedMetamask = await checkIsConnectedWalletConnect();
     }
 
-    handleUserConnection(isConnectedMetamask, isConnectedWalletConnect);
+    handleUserConnection();
 });
 
 </script>

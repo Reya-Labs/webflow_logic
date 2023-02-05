@@ -92,7 +92,22 @@ const connectWalletConnect = async () => {
     return web3;
 };
 
+const handleUserConnection = () => {
+    if (isConnectedMetamask || isConnectedWalletConnect) {
+        buttonMetamask.hidden = true;
+        buttonWalletConnect.hidden = true;
+        buttonVoteYes.hidden = false;
+        buttonVoteNo.hidden = false;
+    } else {
+        buttonMetamask.hidden = false;
+        buttonWalletConnect.hidden = false;
+        buttonVoteYes.hidden = true;
+        buttonVoteNo.hidden = true;
+    }
 
+    buttonQueue.hidden = true;
+    buttonDeploy.hidden = true;
+}
 
 
 
