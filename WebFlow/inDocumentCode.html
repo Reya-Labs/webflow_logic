@@ -1,62 +1,57 @@
 <script>
+  const communityDeployerAddress = "0xFa9DDF4569206625370D2A8546f42c1CC924063c";
+  const jsonPromise = $.getJSON(
+    "https://cdn.jsdelivr.net/gh/Voltz-Protocol/webflow_logic@feat/arb-vote/WebFlow/votingInfo.json"
+  );
 
-const communityDeployerAddress = "0xFa9DDF4569206625370D2A8546f42c1CC924063c";
+  // get a reference to the status box
+  const buttonMetamask = document.getElementById("button-metamask");
+  const buttonWalletConnect = document.getElementById("button-wallet-connect");
+  const buttonVoteYes = document.getElementById("button-vote-yes");
+  const buttonVoteNo = document.getElementById("button-vote-no");
+  const buttonQueue = document.getElementById("button-queue");
+  const buttonDeploy = document.getElementById("button-deploy");
 
-// get a reference to the status box
-const buttonMetamask = document.getElementById("button-metamask");
-const buttonWalletConnect = document.getElementById("button-wallet-connect");
-const buttonVoteYes = document.getElementById("button-vote-yes");
-const buttonVoteNo = document.getElementById("button-vote-no");
-const buttonQueue = document.getElementById("button-queue");
-const buttonDeploy = document.getElementById("button-deploy");
+  let web3;
+  let isConnectedMetamask;
+  let isConnectedWalletConnect;
 
-for (const element in [])
+  let json, communityDeployerABI, merkleDistributorInfo;
+  let communityDeployerContract, account;
 
-let isConnectedMetamask; 
-let isConnectedWalletConnect;
+  handleUserConnection();
 
-let web3;
+  refreshTermEnd();
+  refreshVoteCounters();
 
-handleUserConnection();
-
-// publishVotingEndDate(web3)
-// voteCounter(web3)
-// getTimeLockDate(web3)
-
-
-checkIsConnectedMetamask().then(
-  (isConnected) => {
+  checkIsConnectedMetamask().then((isConnected) => {
     isConnectedMetamask = isConnected;
     handleUserConnection();
-  }
-)
+  });
 
-checkIsConnectedWalletConnect().then(
-  (isConnected) => {
+  checkIsConnectedWalletConnect().then((isConnected) => {
     isConnectedWalletConnect = isConnected;
     handleUserConnection();
-  }
-)
+  });
 
-buttonMetamask.addEventListener("click", async function () {
+  buttonMetamask.addEventListener("click", async function () {
     if (!isConnectedMetamask) {
-      await connectMetamask();    
+      await connectMetamask();
       isConnectedMetamask = await checkIsConnectedMetamask();
     }
 
     handleUserConnection();
-});
+  });
 
-buttonVoteYes.addEventListener("click", async function () {
+  buttonVoteYes.addEventListener("click", async function () {
     if (isConnectedMetamask || isConnectedWalletConnect) {
       await vote(true);
     }
-});
+  });
 
-buttonVoteNo.addEventListener("click", async function () {
+  buttonVoteNo.addEventListener("click", async function () {
     if (isConnectedMetamask || isConnectedWalletConnect) {
       await vote(false);
     }
-});
-
+  });
 </script>
