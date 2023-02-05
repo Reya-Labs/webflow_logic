@@ -22,7 +22,7 @@ const checkIsConnectedMetamask = async () => {
         console.log(error);
     }
 
-    console.log("isConnected", isConnected);
+    console.log("Metamask connected status:", isConnected);
     return isConnected;
 };
 
@@ -42,6 +42,7 @@ const checkIsConnectedWalletConnect = async (web3) => {
         console.log(error);
     }
 
+    console.log("Wallet connect connected status:", isConnected);
     return isConnected;
 };
 
@@ -93,6 +94,7 @@ const connectWalletConnect = async () => {
 };
 
 const handleUserConnection = () => {
+    console.log("handle user connection", isConnectedMetamask, isConnectedWalletConnect);
     if (isConnectedMetamask || isConnectedWalletConnect) {
         buttonMetamask.hidden = true;
         buttonWalletConnect.hidden = true;
