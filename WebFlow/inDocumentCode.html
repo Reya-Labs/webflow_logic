@@ -1,0 +1,52 @@
+<script>
+// get a reference to the status box
+const buttonMetamask = document.getElementById("button-metamask");
+const buttonWalletConnect = document.getElementById("button-wallet-connect");
+const buttonVoteYes = document.getElementById("button-vote-yes");
+const buttonVoteNo = document.getElementById("button-vote-no");
+const buttonQueue = document.getElementById("button-queue");
+const buttonDeploy = document.getElementById("button-deploy");
+
+let isConnectedMetamask; 
+let isConnectedWalletConnect;
+
+let web3;
+
+// publishVotingEndDate(web3)
+// voteCounter(web3)
+// getTimeLockDate(web3)
+
+
+checkIsConnectedMetamask().then(
+  (isConnected) => {
+    isConnectedMetamask = isConnected;
+    handleUserConnection(isConnectedMetamask, isConnectedWalletConnect);
+  }
+)
+
+checkIsConnectedWalletConnect().then(
+  (isConnected) => {
+    isConnectedWalletConnect = isConnected;
+    handleUserConnection(isConnectedMetamask, isConnectedWalletConnect);
+  }
+)
+
+buttonMetamask.addEventListener("click", async function () {
+    if (!isConnectedMetamask) {
+      await connectMetamask();    
+      isConnectedMetamask = await checkIsConnectedMetamask();
+    }
+
+    handleUserConnection(isConnectedMetamask, isConnectedWalletConnect);
+});
+
+buttonWalletConnect.addEventListener("click", async function () {
+    if (!isConnectedMetamask) {
+      await connectWalletConnect();    
+      isConnectedMetamask = await checkIsConnectedWalletConnect();
+    }
+
+    handleUserConnection(isConnectedMetamask, isConnectedWalletConnect);
+});
+
+</script>

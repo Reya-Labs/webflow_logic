@@ -1,24 +1,4 @@
-const checkIfWalletConnectIsConnected = async (web3) => {
-    console.log("window", window);
-    let __isConnected = false;
-
-    try {
-        if (!web3) {
-            console.log("Wallet connect is not connected");
-        } else {
-            console.log("We have the web3 object", web3);
-            const accounts = await web3.eth.getAccounts(); // get all connected accounts
-            console.log("accounts ", accounts);
-            __isConnected = true;
-        }
-    } catch (error) {
-        console.log(error);
-    }
-
-    return __isConnected;
-};
-
-const checkIfWalletIsConnected = async () => {
+const checkIsConnectedMetamask = async () => {
     let isConnected = false;
     try {
         const { ethereum } = window;
@@ -31,7 +11,6 @@ const checkIfWalletIsConnected = async () => {
         }
 
         const accounts = await ethereum.request({ method: "eth_accounts" });
-
         if (accounts.length !== 0) {
             const account = accounts[0];
             console.log("Found an authorized account:", account);
@@ -42,8 +21,48 @@ const checkIfWalletIsConnected = async () => {
     } catch (error) {
         console.log(error);
     }
+
     console.log("isConnected", isConnected);
     return isConnected;
+};
+
+const checkIsConnectedWalletConnect = async (web3) => {
+    let isConnected = false;
+
+    try {
+        if (!web3) {
+            console.log("Wallet connect is not connected");
+        } else {
+            console.log("We have the web3 object", web3);
+            const accounts = await web3.eth.getAccounts();
+            console.log("accounts ", accounts);
+            isConnected = true;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+
+    return isConnected;
+};
+
+const connectMetamask = async () => {
+    try {
+        const { ethereum } = window;
+        if (!ethereum) {
+            if (
+                window.confirm(
+                    'Get MetaMask! If you click "ok" you will be redirected to install MetaMask'
+                )
+            ) {
+                window.location.href = "https://metamask.io/";
+            }
+            return;
+        }
+
+        await ethereum.request({ method: "eth_requestAccounts" });
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 const connectWalletConnect = async () => {
@@ -59,13 +78,11 @@ const connectWalletConnect = async () => {
         });
 
         await provider.enable();
+
         //  Create Web3 instance
         const web3 = new Web3(provider);
-        console.log(web3, "web3");
         window.w3 = web3;
-        const accounts = await web3.eth.getAccounts(); // get all connected accounts
-        account = accounts[0]; // get the primary account
-        console.log("WC account", account);
+        await web3.eth.getAccounts(); // get all connected accounts
         // returning web3
         return web3;
     } catch (error) {
@@ -75,27 +92,9 @@ const connectWalletConnect = async () => {
     return web3;
 };
 
-const connectWallet = async () => {
-    // connect to metamask
-    try {
-        const { ethereum } = window;
 
-        if (!ethereum) {
-            if (
-                window.confirm(
-                    'Get MetaMask! If you click "ok" you will be redirected to install MetaMask'
-                )
-            ) {
-                window.location.href = "https://metamask.io/";
-            }
-            return;
-        }
 
-        const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-    } catch (error) {
-        console.log(error);
-    }
-};
+
 
 const getYesVote = async () => {
     /// retrive the vote of the user from the radio buttons
@@ -512,7 +511,6 @@ const queue = async (web3) => {
 
     await queueEthers(contractAddress, contractABI);
 };
-
 
 
 // After the launch of the vote
