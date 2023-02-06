@@ -160,7 +160,7 @@ const handleUserConnection = async () => {
   if (isConnectedMetamask || isConnectedWalletConnect) {
     await refreshTermEnd();
 
-    if (Date.now() * 1000 <= termEnd) {
+    if (Date.now() <= termEnd * 1000) {
       const hasUserVoted = await hasVoted();
       if (hasUserVoted) {
         buttonSubmit.innerHTML = "YOU ALREADY VOTED";
