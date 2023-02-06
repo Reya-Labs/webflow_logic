@@ -1,16 +1,23 @@
 <script>
+  const ArbitrumChainId = 42161;
+  const ArbitrumGoerliChainId = 421613;
+  const targetChainId = ArbitrumChainId;
+
   const communityDeployerAddress = "0xFa9DDF4569206625370D2A8546f42c1CC924063c";
   const jsonPromise = $.getJSON(
-    "https://cdn.jsdelivr.net/gh/Voltz-Protocol/webflow_logic@feat/arb-vote/WebFlow/votingInfo.json"
+    "https://cdn.jsdelivr.net/gh/Voltz-Protocol/webflow_logic@main/WebFlow/votingInfo.json"
   );
 
-  // get a reference to the status box
+  // get a reference to elements
   const buttonMetamask = document.getElementById("button-metamask");
   const buttonWalletConnect = document.getElementById("button-wallet-connect");
-  const buttonVoteYes = document.getElementById("button-vote-yes");
-  const buttonVoteNo = document.getElementById("button-vote-no");
-  const buttonQueue = document.getElementById("button-queue");
-  const buttonDeploy = document.getElementById("button-deploy");
+  const buttonSubmit = document.getElementById("button-submit");
+
+  const textStatus = document.getElementById("text-status");
+  const buttonRadioYes = document.getElementById("button-radio-yes");
+  const buttonRadioNo = document.getElementById("button-radio-no");
+
+  const buttonDisconnect = document.getElementById("button-disconnect");
 
   let web3;
   let isConnectedMetamask;
@@ -19,39 +26,92 @@
   let json, communityDeployerABI, merkleDistributorInfo;
   let communityDeployerContract, account;
 
-  handleUserConnection();
+  let termEnd;
 
   refreshTermEnd();
   refreshVoteCounters();
+  handleUserConnection();
 
   checkIsConnectedMetamask().then((isConnected) => {
-    isConnectedMetamask = isConnected;
-    handleUserConnection();
+    if (isConnected !== isConnectedMetamask) {
+      isConnectedMetamask = isConnected;
+      handleUserConnection();
+    }
   });
 
   checkIsConnectedWalletConnect().then((isConnected) => {
-    isConnectedWalletConnect = isConnected;
-    handleUserConnection();
+    if (isConnected !== isConnectedWalletConnect) {
+      isConnectedWalletConnect = isConnected;
+      handleUserConnection();
+    }
   });
 
   buttonMetamask.addEventListener("click", async function () {
+    await handleUserConnection();
     if (!isConnectedMetamask) {
       await connectMetamask();
       isConnectedMetamask = await checkIsConnectedMetamask();
+      if (isConnectedMetamask) {
+        await handleUserConnection();
+      }
+    }
+  });
+
+  buttonWalletConnect.addEventListener("click", async function () {
+    await handleUserConnection();
+    if (!isConnectedWalletConnect) {
+      await connectWalletConnect();
+      isConnectedWalletConnect = await checkIsConnectedWalletConnect();
+      if (isConnectedWalletConnect) {
+        await handleUserConnection();
+      }
+    }
+  });
+
+  buttonSubmit.addEventListener("click", async function () {
+    handleUserConnection();
+    if (buttonSubmit.innerHTML === "VOTE") {
+      if (isConnectedMetamask || isConnectedWalletConnect) {
+        const yesSelected = buttonRadioYes.checked;
+        const noSelected = buttonRadioNo.checked;
+        if (!yesSelected && !noSelected) {
+          updateStatus("You must choose your voting option.");
+        } else {
+          await vote(yesSelected);
+        }
+      } else {
+        updateStatus("Wallet not connected");
+      }
+    } else if (buttonSubmit.innerHTML === "QUEUE") {
+      if (isConnectedMetamask || isConnectedWalletConnect) {
+        await queue();
+      } else {
+        updateStatus("Wallet not connected");
+      }
+    } else if (buttonSubmit.innerHTML === "DEPLOY") {
+      if (isConnectedMetamask || isConnectedWalletConnect) {
+        await deploy();
+      } else {
+        updateStatus("Wallet not connected");
+      }
+    }
+  });
+
+  buttonDisconnect.addEventListener("click", async function () {
+    if (isConnectedMetamask) {
+      await window.ethereum.request({
+        method: "eth_requestAccounts",
+        params: [{ eth_accounts: {} }],
+      });
+      isConnectedMetamask = await checkIsConnectedMetamask();
+    }
+
+    if (isConnectedWalletConnect || web3) {
+      await web3.eth.currentProvider.disconnect();
+      web3 = undefined;
+      isConnectedWalletConnect = await checkIsConnectedWalletConnect();
     }
 
     handleUserConnection();
-  });
-
-  buttonVoteYes.addEventListener("click", async function () {
-    if (isConnectedMetamask || isConnectedWalletConnect) {
-      await vote(true);
-    }
-  });
-
-  buttonVoteNo.addEventListener("click", async function () {
-    if (isConnectedMetamask || isConnectedWalletConnect) {
-      await vote(false);
-    }
   });
 </script>

@@ -29,6 +29,10 @@ const getJSONAndPopulateVariables = async () => {
   }
 };
 
+const updateStatus = (newStatus) => {
+  textStatus.innerHTML = `Status: ${newStatus}`;
+};
+
 const checkIsConnectedMetamask = async () => {
   let isConnected = false;
   try {
@@ -45,6 +49,18 @@ const checkIsConnectedMetamask = async () => {
     if (accounts.length !== 0) {
       const account = accounts[0];
       console.log("Found an authorized account:", account);
+
+      const currentChainId = await window.ethereum.request({
+        method: "eth_chainId",
+      });
+
+      if (currentChainId !== targetChainId) {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: `0x${targetChainId.toString(16)}` }],
+        });
+      }
+
       isConnected = true;
     } else {
       console.log("No authorized account found");
@@ -57,7 +73,7 @@ const checkIsConnectedMetamask = async () => {
   return isConnected;
 };
 
-const checkIsConnectedWalletConnect = async (web3) => {
+const checkIsConnectedWalletConnect = async () => {
   let isConnected = false;
 
   try {
@@ -67,7 +83,16 @@ const checkIsConnectedWalletConnect = async (web3) => {
       console.log("We have the web3 object", web3);
       const accounts = await web3.eth.getAccounts();
       console.log("accounts ", accounts);
-      isConnected = true;
+
+      const currentChainId = await web3.eth.getChainId();
+      console.log(currentChainId, targetChainId);
+      if (currentChainId !== targetChainId) {
+        updateStatus(
+          "Wrong network. To vote, connect your wallet to Arbitrum."
+        );
+      } else {
+        isConnected = true;
+      }
     }
   } catch (error) {
     console.log(error);
@@ -91,7 +116,8 @@ const connectMetamask = async () => {
       return;
     }
 
-    await ethereum.request({ method: "eth_requestAccounts" });
+    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+    account = accounts[0];
   } catch (error) {
     console.log(error);
   }
@@ -104,46 +130,71 @@ const connectWalletConnect = async () => {
       rpc: {
         1: "https://cloudflare-eth.com/", // https://ethereumnodes.com/
         137: "https://polygon-rpc.com/", // https://docs.polygon.technology/docs/develop/network-details/network/
-        // ...
+        ArbitrumChainId: "https://arbitrum-mainnet.infura.io",
+        ArbitrumGoerliChainId:
+          "https://arb-goerli.g.alchemy.com/v2/NAchH37qkjRO-021BTre8pcZHch4Lm0u",
       },
-      // bridge: 'https://bridge.walletconnect.org',
     });
 
     await provider.enable();
 
     //  Create Web3 instance
-    const web3 = new Web3(provider);
+    web3 = new Web3(provider);
     window.w3 = web3;
-    await web3.eth.getAccounts(); // get all connected accounts
+    const accounts = await web3.eth.getAccounts(); // get all connected accounts
+    account = accounts[0];
     // returning web3
     return web3;
   } catch (error) {
     console.log(error);
   }
-
-  return web3;
 };
 
-const handleUserConnection = () => {
+const handleUserConnection = async () => {
   console.log(
     "handle user connection",
     isConnectedMetamask,
     isConnectedWalletConnect
   );
-  if (isConnectedMetamask || isConnectedWalletConnect) {
-    buttonMetamask.style.visibility = "hidden";
-    buttonWalletConnect.style.visibility = "hidden";
-    buttonVoteYes.style.visibility = "visible";
-    buttonVoteNo.style.visibility = "visible";
-  } else {
-    buttonMetamask.style.visibility = "visible";
-    buttonWalletConnect.style.visibility = "visible";
-    buttonVoteYes.style.visibility = "hidden";
-    buttonVoteNo.style.visibility = "hidden";
-  }
 
-  buttonQueue.style.visibility = "hidden";
-  buttonDeploy.style.visibility = "hidden";
+  if (isConnectedMetamask || isConnectedWalletConnect) {
+    await refreshTermEnd();
+
+    if (Date.now() * 1000 <= termEnd) {
+      const hasUserVoted = await hasVoted();
+      if (hasUserVoted) {
+        buttonSubmit.innerHTML = "YOU ALREADY VOTED";
+      } else {
+        buttonSubmit.innerHTML = "VOTE";
+      }
+    } else {
+      const canUserQueue = await canQueue();
+      if (canUserQueue) {
+        buttonSubmit.innerHTML = "QUEUE";
+      } else {
+        const canUserDeploy = await canDeploy();
+        if (canUserDeploy) {
+          buttonSubmit.innerHTML = "DEPLOY";
+        } else {
+          buttonSubmit.innerHTML = "NO FURTHER ACTIONS";
+        }
+      }
+    }
+
+    buttonMetamask.style.display = "none";
+    buttonWalletConnect.style.display = "none";
+    buttonSubmit.style.display = "block";
+
+    updateStatus(`Wallet ${account} connected`);
+
+    refreshVoteCounters();
+  } else {
+    buttonMetamask.style.display = "block";
+    buttonWalletConnect.style.display = "block";
+    buttonSubmit.style.display = "none";
+
+    updateStatus("Wallet not connected");
+  }
 };
 
 const vote = async (isVoteYes) => {
@@ -153,6 +204,8 @@ const vote = async (isVoteYes) => {
   } else if (isConnectedWalletConnect) {
     await voteWalletConnect(isVoteYes);
   }
+
+  refreshVoteCounters();
 };
 
 const voteMetamask = async (isVoteYes) => {
@@ -166,9 +219,10 @@ const voteMetamask = async (isVoteYes) => {
       );
 
       await txResponse.wait();
+      refreshTermEnd();
       // await voteCounter(web3);
     } else {
-      console.log("Account not eligible to vote");
+      updateStatus(`Connected account (${account}) is not eligible for voting`);
     }
   } catch (err) {
     console.log(err);
@@ -187,18 +241,97 @@ const voteWalletConnect = async (isVoteYes) => {
         )
         .send({ from: account });
       console.log(`Voted ${isVoteYes} successfully`);
+      refreshTermEnd();
     } else {
-      console.log("Account not eligible to vote");
+      updateStatus(`Connected account (${account}) is not eligible for voting`);
     }
   } catch (err) {
     console.log(err);
   }
 };
 
+const hasVoted = async () => {
+  await getJSONAndPopulateVariables();
+  if (isConnectedMetamask) {
+    return await hasVotedMetamask();
+  } else if (isConnectedWalletConnect) {
+    return await hasVotedWalletConnect();
+  }
+};
+
+const hasVotedMetamask = async () => {
+  try {
+    if (merkleDistributorInfo[account]) {
+      return await communityDeployerContract.hasVoted(
+        merkleDistributorInfo[account]["index"]
+      );
+    }
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+
+  return false;
+};
+
+const hasVotedWalletConnect = async () => {
+  try {
+    if (merkleDistributorInfo[account]) {
+      return await communityDeployerContract.methods
+        .hasVoted(merkleDistributorInfo[account]["index"])
+        .call();
+    }
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+
+  return false;
+};
+
+const canVote = async () => {
+  await getJSONAndPopulateVariables();
+  if (merkleDistributorInfo[account]) {
+    return true;
+  }
+
+  return false;
+};
+
+const canQueue = async () => {
+  await getJSONAndPopulateVariables();
+  try {
+    if (isConnectedMetamask) {
+      await communityDeployerContract.callStatic.queue();
+    } else {
+      await communityDeployerContract.queue().estimateGas();
+    }
+
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
+const canDeploy = async () => {
+  await getJSONAndPopulateVariables();
+  try {
+    if (isConnectedMetamask) {
+      await communityDeployerContract.callStatic.deploy();
+    } else {
+      await communityDeployerContract.deploy().estimateGas();
+    }
+
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
 const refreshTermEnd = async () => {
   await getJSONAndPopulateVariables();
 
-  let termEnd = 0;
+  termEnd = 0;
   if (isConnectedMetamask) {
     termEnd = await communityDeployerContract.blockTimestampVotingEnd();
   } else if (isConnectedWalletConnect) {
@@ -209,10 +342,11 @@ const refreshTermEnd = async () => {
 
   if (termEnd > 0) {
     const dateObject = new Date(termEnd * 1000);
-    document.getElementById("voting-end-date").innerHTML =
-      dateObject.toLocaleString();
+    document.getElementById(
+      "term-end"
+    ).innerHTML = `When | ${dateObject.toLocaleString()}`;
   } else {
-    document.getElementById("voting-end-date").innerHTML = "SOON!";
+    document.getElementById("term-end").innerHTML = `When | SOON!`;
   }
 };
 
@@ -237,8 +371,8 @@ const refreshVoteCounters = async () => {
     console.log(err);
   }
 
-  document.getElementById("nr-yes-votes").innerHTML = totalYesCount.toString();
-  document.getElementById("nr-no-votes").innerHTML = totalNoCount.toString();
+  document.getElementById("yes-counter").innerHTML = totalYesCount.toString();
+  document.getElementById("no-counter").innerHTML = totalNoCount.toString();
 };
 
 const queue = async () => {
