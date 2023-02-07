@@ -69,7 +69,7 @@
   });
 
   buttonSubmit.addEventListener("click", async function () {
-    handleUserConnection();
+    await handleUserConnection();
     if (buttonSubmit.innerHTML === "VOTE") {
       if (isConnectedMetamask || isConnectedWalletConnect) {
         const yesSelected = buttonRadioYes.checked;
@@ -100,8 +100,12 @@
   buttonDisconnect.addEventListener("click", async function () {
     if (isConnectedMetamask) {
       await window.ethereum.request({
-        method: "eth_requestAccounts",
-        params: [{ eth_accounts: {} }],
+        method: "wallet_requestPermissions",
+        params: [
+          {
+            eth_accounts: {},
+          },
+        ],
       });
       isConnectedMetamask = await checkIsConnectedMetamask();
     }
@@ -112,6 +116,6 @@
       isConnectedWalletConnect = await checkIsConnectedWalletConnect();
     }
 
-    handleUserConnection();
+    await handleUserConnection();
   });
 </script>

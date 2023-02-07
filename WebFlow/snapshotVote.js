@@ -55,17 +55,25 @@ const checkIsConnectedMetamask = async () => {
       });
 
       if (currentChainId !== targetChainId) {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: `0x${targetChainId.toString(16)}` }],
-        });
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: `0x${targetChainId.toString(16)}` }],
+          });
+        } catch (error) {
+          updateStatus(
+            "Unable to switch network to Arbitrum. If you are using Metamask, make sure you have Arbitrum in your added networks. If you are using Wallet Connect, make sure you connected wallet on Arbitrum."
+          );
+        }
       }
 
       isConnected = true;
     } else {
+      updateStatus("No authorized account found");
       console.log("No authorized account found");
     }
   } catch (error) {
+    updateStatus("Error when accessing Metamask");
     console.log(error);
   }
 
@@ -165,7 +173,12 @@ const handleUserConnection = async () => {
       if (hasUserVoted) {
         buttonSubmit.innerHTML = "YOU ALREADY VOTED";
       } else {
-        buttonSubmit.innerHTML = "VOTE";
+        const canUserVote = await canVote();
+        if (canUserVote) {
+          buttonSubmit.innerHTML = "VOTE";
+        } else {
+          buttonSubmit.innerHTML = "YOU ARE NOT ELIGIBLE TO VOTE";
+        }
       }
     } else {
       const canUserQueue = await canQueue();
