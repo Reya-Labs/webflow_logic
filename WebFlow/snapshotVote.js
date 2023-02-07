@@ -62,7 +62,10 @@ const checkIsConnectedMetamask = async () => {
           });
         } catch (error) {
           updateStatus(
-            "Unable to switch network to Arbitrum. If you are using Metamask, make sure you have Arbitrum in your added networks. If you are using Wallet Connect, make sure you connected wallet on Arbitrum."
+            "Unable to switch network to Arbitrum. Make sure you have Arbitrum in your added networks in Metamask."
+          );
+          window.confirm(
+            "Unable to switch network to Arbitrum. Make sure you have Arbitrum in your added networks in Metamask."
           );
         }
       }
@@ -96,7 +99,10 @@ const checkIsConnectedWalletConnect = async () => {
       console.log(currentChainId, targetChainId);
       if (currentChainId !== targetChainId) {
         updateStatus(
-          "Wrong network. To vote, connect your wallet to Arbitrum."
+          "Wrong network. To vote, disconnect and connect your wallet again on Arbitrum."
+        );
+        window.confirm(
+          "Wrong network. To vote, disconnect and connect your wallet again on Arbitrum."
         );
       } else {
         isConnected = true;
@@ -139,8 +145,7 @@ const connectWalletConnect = async () => {
         1: "https://cloudflare-eth.com/", // https://ethereumnodes.com/
         137: "https://polygon-rpc.com/", // https://docs.polygon.technology/docs/develop/network-details/network/
         ArbitrumChainId: "https://arbitrum-mainnet.infura.io",
-        ArbitrumGoerliChainId:
-          "https://arb-goerli.g.alchemy.com/v2/NAchH37qkjRO-021BTre8pcZHch4Lm0u",
+        ArbitrumGoerliChainId: "https://goerli-rollup.arbitrum.io/rpc",
       },
     });
 
