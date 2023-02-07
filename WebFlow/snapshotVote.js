@@ -324,7 +324,7 @@ const canQueue = async () => {
       await communityDeployerContract.callStatic.queue();
       return true;
     } else if (isConnectedWalletConnect) {
-      await communityDeployerContract.methods.queue().estimateGas();
+      await communityDeployerContract.methods.queue().estimateGas({from: account});
       return true;
     }
 
@@ -341,7 +341,7 @@ const canDeploy = async () => {
       await communityDeployerContract.callStatic.deploy();
       return true;
     } else if (isConnectedWalletConnect) {
-      await communityDeployerContract.methods.deploy().estimateGas();
+      await communityDeployerContract.methods.deploy().estimateGas({from: account});
       return true;
     }
 
