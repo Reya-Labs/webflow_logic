@@ -23,6 +23,7 @@ const getJSONAndPopulateVariables = async () => {
       );
 
       account = await web3.currentProvider.accounts[0];
+      account = web3.utils.toChecksumAddress(account);
     }
   } catch (err) {
     console.log(err);
@@ -144,8 +145,8 @@ const connectWalletConnect = async () => {
       rpc: {
         1: "https://cloudflare-eth.com/", // https://ethereumnodes.com/
         137: "https://polygon-rpc.com/", // https://docs.polygon.technology/docs/develop/network-details/network/
-        ArbitrumChainId: "https://arbitrum-mainnet.infura.io",
-        ArbitrumGoerliChainId: "https://goerli-rollup.arbitrum.io/rpc",
+        42161: "https://arb1.arbitrum.io/rpc",
+        421613: "https://goerli-rollup.arbitrum.io/rpc",
       },
     });
 
