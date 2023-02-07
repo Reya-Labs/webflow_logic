@@ -358,14 +358,14 @@ const refreshTermEnd = async () => {
       .call();
   }
 
-  if (termEnd > 0) {
-    const dateObject = new Date(termEnd * 1000);
-    document.getElementById(
-      "term-end"
-    ).innerHTML = `When | ${dateObject.toLocaleString()}`;
-  } else {
-    document.getElementById("term-end").innerHTML = `When | SOON!`;
-  }
+  // if (termEnd > 0) {
+  //   const dateObject = new Date(termEnd * 1000);
+  //   document.getElementById(
+  //     "term-end"
+  //   ).innerHTML = `When | ${dateObject.toLocaleString()}`;
+  // } else {
+  //   document.getElementById("term-end").innerHTML = `When | SOON!`;
+  // }
 };
 
 const refreshVoteCounters = async () => {
