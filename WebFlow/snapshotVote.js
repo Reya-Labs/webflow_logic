@@ -223,7 +223,8 @@ const vote = async (isVoteYes) => {
     await voteWalletConnect(isVoteYes);
   }
 
-  refreshVoteCounters();
+  await refreshVoteCounters();
+  await handleUserConnection();
 };
 
 const voteMetamask = async (isVoteYes) => {
@@ -321,11 +322,13 @@ const canQueue = async () => {
   try {
     if (isConnectedMetamask) {
       await communityDeployerContract.callStatic.queue();
-    } else {
-      await communityDeployerContract.queue().estimateGas();
+      return true;
+    } else if (isConnectedWalletConnect) {
+      await communityDeployerContract.methods.queue().estimateGas();
+      return true;
     }
 
-    return true;
+    return false;
   } catch (err) {
     return false;
   }
@@ -336,11 +339,13 @@ const canDeploy = async () => {
   try {
     if (isConnectedMetamask) {
       await communityDeployerContract.callStatic.deploy();
-    } else {
-      await communityDeployerContract.deploy().estimateGas();
+      return true;
+    } else if (isConnectedWalletConnect) {
+      await communityDeployerContract.methods.deploy().estimateGas();
+      return true;
     }
 
-    return true;
+    return false;
   } catch (err) {
     return false;
   }
@@ -403,6 +408,8 @@ const queue = async () => {
     } else if (isConnectedWalletConnect) {
       await communityDeployerContract.methods.queue().send({ from: account });
     }
+
+    await handleUserConnection();
   } catch (err) {
     console.log(err);
   }
@@ -418,6 +425,8 @@ const deploy = async () => {
     } else if (isConnectedWalletConnect) {
       await communityDeployerContract.methods.deploy().send({ from: account });
     }
+
+    await handleUserConnection();
   } catch (err) {
     console.log(err);
   }
