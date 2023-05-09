@@ -196,8 +196,8 @@ const handleUserConnection = async () => {
         if (canUserDeploy) {
           buttonSubmit.innerHTML = "DEPLOY";
         } else {
-          const isQueued = await isQueued();
-          buttonSubmit.innerHTML = (isQueued) ? "DEPLOYMENT QUEUED" : "NO FURTHER ACTIONS";
+          const isQ = await isQueued();
+          buttonSubmit.innerHTML = (isQ) ? "DEPLOYMENT QUEUED" : "NO FURTHER ACTIONS";
         }
       }
     }
@@ -222,6 +222,8 @@ const vote = async (isVoteYes) => {
   await getJSONAndPopulateVariables();
 
   let voteSuccess = false;
+
+  updateStatus("Voting...");
   if (isConnectedMetamask) {
     voteSuccess = await voteMetamask(isVoteYes);
   } else if (isConnectedWalletConnect) {
@@ -233,6 +235,8 @@ const vote = async (isVoteYes) => {
 
   if (voteSuccess) {
     updateStatus(`Vote ${isVoteYes?"YES":"NO"} registered successfully`);
+  } else {
+    updateStatus(`Vote ${isVoteYes?"YES":"NO"} failed`);
   }
 };
 
