@@ -378,8 +378,7 @@ const refreshTermEnd = async () => {
 const refreshVoteCounters = async () => {
   await getJSONAndPopulateVariables();
 
-  let totalYesCount = 0,
-    totalNoCount = 0;
+  let totalYesCount = null, totalNoCount = null;
   try {
     if (isConnectedMetamask) {
       totalYesCount = await communityDeployerContract.yesVoteCount();
@@ -396,8 +395,8 @@ const refreshVoteCounters = async () => {
     console.log(err);
   }
 
-  document.getElementById("yes-counter").innerHTML = totalYesCount.toString();
-  document.getElementById("no-counter").innerHTML = totalNoCount.toString();
+  document.getElementById("yes-counter").innerHTML = (totalYesCount !== null) ? totalYesCount.toString() : '--';
+  document.getElementById("no-counter").innerHTML = (totalNoCount !== null) ? totalNoCount.toString() : '--';
 };
 
 const queue = async () => {
