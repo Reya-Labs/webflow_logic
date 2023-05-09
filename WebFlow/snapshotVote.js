@@ -63,10 +63,10 @@ const checkIsConnectedMetamask = async () => {
           });
         } catch (error) {
           updateStatus(
-            "Unable to switch network to Arbitrum. Make sure you have Arbitrum in your added networks in Metamask."
+            "Unable to switch network to Avalanche. Make sure you have Avalanche in your added networks in Metamask."
           );
           window.confirm(
-            "Unable to switch network to Arbitrum. Make sure you have Arbitrum in your added networks in Metamask."
+            "Unable to switch network to Avalanche. Make sure you have Avalanche in your added networks in Metamask."
           );
         }
       }
@@ -100,10 +100,10 @@ const checkIsConnectedWalletConnect = async () => {
       console.log(currentChainId, targetChainId);
       if (currentChainId !== targetChainId) {
         updateStatus(
-          "Wrong network. To vote, disconnect and connect your wallet again on Arbitrum."
+          "Wrong network. To vote, disconnect and connect your wallet again on Avalanche."
         );
         window.confirm(
-          "Wrong network. To vote, disconnect and connect your wallet again on Arbitrum."
+          "Wrong network. To vote, disconnect and connect your wallet again on Avalanche."
         );
       } else {
         isConnected = true;
@@ -144,9 +144,10 @@ const connectWalletConnect = async () => {
     const provider = new WalletConnectProvider.default({
       rpc: {
         1: "https://cloudflare-eth.com/", // https://ethereumnodes.com/
-        137: "https://polygon-rpc.com/", // https://docs.polygon.technology/docs/develop/network-details/network/
         42161: "https://arb1.arbitrum.io/rpc",
         421613: "https://goerli-rollup.arbitrum.io/rpc",
+        43114: "https://api.avax.network/ext/bc/C/rpc",
+        43113: "https://api.avax-test.network/ext/C/rpc",
       },
     });
 
