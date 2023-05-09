@@ -221,7 +221,7 @@ const handleUserConnection = async () => {
 const vote = async (isVoteYes) => {
   await getJSONAndPopulateVariables();
 
-  const voteSuccess = false;
+  let voteSuccess = false;
   if (isConnectedMetamask) {
     voteSuccess = await voteMetamask(isVoteYes);
   } else if (isConnectedWalletConnect) {
