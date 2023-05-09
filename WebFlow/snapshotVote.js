@@ -196,7 +196,8 @@ const handleUserConnection = async () => {
         if (canUserDeploy) {
           buttonSubmit.innerHTML = "DEPLOY";
         } else {
-          buttonSubmit.innerHTML = "NO FURTHER ACTIONS";
+          const isQueued = await isQueued();
+          buttonSubmit.innerHTML = (isQueued) ? "DEPLOYMENT QUEUED" : "NO FURTHER ACTIONS";
         }
       }
     }
@@ -219,14 +220,20 @@ const handleUserConnection = async () => {
 
 const vote = async (isVoteYes) => {
   await getJSONAndPopulateVariables();
+
+  const voteSuccess = false;
   if (isConnectedMetamask) {
-    await voteMetamask(isVoteYes);
+    voteSuccess = await voteMetamask(isVoteYes);
   } else if (isConnectedWalletConnect) {
-    await voteWalletConnect(isVoteYes);
+    voteSuccess = await voteWalletConnect(isVoteYes);
   }
 
   await refreshVoteCounters();
   await handleUserConnection();
+
+  if (voteSuccess) {
+    updateStatus(`Vote ${isVoteYes?"YES":"NO"} registered successfully`);
+  }
 };
 
 const voteMetamask = async (isVoteYes) => {
@@ -241,12 +248,15 @@ const voteMetamask = async (isVoteYes) => {
 
       await txResponse.wait();
       refreshTermEnd();
+      return true;
       // await voteCounter(web3);
     } else {
       updateStatus(`Connected account (${account}) is not eligible for voting`);
+      return false;
     }
   } catch (err) {
     console.log(err);
+    return false;
   }
 };
 
@@ -263,11 +273,14 @@ const voteWalletConnect = async (isVoteYes) => {
         .send({ from: account });
       console.log(`Voted ${isVoteYes} successfully`);
       refreshTermEnd();
+      return true;
     } else {
       updateStatus(`Connected account (${account}) is not eligible for voting`);
+      return false;
     }
   } catch (err) {
     console.log(err);
+    return false;
   }
 };
 
@@ -345,6 +358,21 @@ const canDeploy = async () => {
     } else if (isConnectedWalletConnect) {
       await communityDeployerContract.methods.deploy().estimateGas({from: account});
       return true;
+    }
+
+    return false;
+  } catch (err) {
+    return false;
+  }
+};
+
+const isQueued = async () => {
+  await getJSONAndPopulateVariables();
+  try {
+    if (isConnectedMetamask) {
+      return await communityDeployerContract.isQueued();
+    } else if (isConnectedWalletConnect) {
+      return await communityDeployerContract.methods.isQueued().call();
     }
 
     return false;
