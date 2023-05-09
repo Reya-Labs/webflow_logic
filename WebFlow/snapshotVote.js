@@ -197,7 +197,12 @@ const handleUserConnection = async () => {
           buttonSubmit.innerHTML = "DEPLOY";
         } else {
           const isQ = await isQueued();
-          buttonSubmit.innerHTML = (isQ) ? "DEPLOYMENT QUEUED" : "NO FURTHER ACTIONS";
+          const isD = await isDeployed();
+          if (isQ && !isD) {
+            buttonSubmit.innerHTML = "DEPLOYMENT QUEUED";
+          } else {
+            buttonSubmit.innerHTML = "NO FURTHER ACTIONS";
+          }
         }
       }
     }
@@ -377,6 +382,21 @@ const isQueued = async () => {
       return await communityDeployerContract.isQueued();
     } else if (isConnectedWalletConnect) {
       return await communityDeployerContract.methods.isQueued().call();
+    }
+
+    return false;
+  } catch (err) {
+    return false;
+  }
+};
+
+const isDeployed = async () => {
+  await getJSONAndPopulateVariables();
+  try {
+    if (isConnectedMetamask) {
+      return await communityDeployerContract.isDeployed();
+    } else if (isConnectedWalletConnect) {
+      return await communityDeployerContract.methods.isDeployed().call();
     }
 
     return false;
