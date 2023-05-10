@@ -63,10 +63,10 @@ const checkIsConnectedMetamask = async () => {
           });
         } catch (error) {
           updateStatus(
-            "Unable to switch network to Arbitrum. Make sure you have Arbitrum in your added networks in Metamask."
+            "Unable to switch network to Avalanche. Make sure you have Avalanche in your added networks in Metamask."
           );
           window.confirm(
-            "Unable to switch network to Arbitrum. Make sure you have Arbitrum in your added networks in Metamask."
+            "Unable to switch network to Avalanche. Make sure you have Avalanche in your added networks in Metamask."
           );
         }
       }
@@ -100,10 +100,10 @@ const checkIsConnectedWalletConnect = async () => {
       console.log(currentChainId, targetChainId);
       if (currentChainId !== targetChainId) {
         updateStatus(
-          "Wrong network. To vote, disconnect and connect your wallet again on Arbitrum."
+          "Wrong network. To vote, disconnect and connect your wallet again on Avalanche."
         );
         window.confirm(
-          "Wrong network. To vote, disconnect and connect your wallet again on Arbitrum."
+          "Wrong network. To vote, disconnect and connect your wallet again on Avalanche."
         );
       } else {
         isConnected = true;
@@ -144,9 +144,10 @@ const connectWalletConnect = async () => {
     const provider = new WalletConnectProvider.default({
       rpc: {
         1: "https://cloudflare-eth.com/", // https://ethereumnodes.com/
-        137: "https://polygon-rpc.com/", // https://docs.polygon.technology/docs/develop/network-details/network/
         42161: "https://arb1.arbitrum.io/rpc",
         421613: "https://goerli-rollup.arbitrum.io/rpc",
+        43114: "https://api.avax.network/ext/bc/C/rpc",
+        43113: "https://api.avax-test.network/ext/C/rpc",
       },
     });
 
@@ -195,7 +196,13 @@ const handleUserConnection = async () => {
         if (canUserDeploy) {
           buttonSubmit.innerHTML = "DEPLOY";
         } else {
-          buttonSubmit.innerHTML = "NO FURTHER ACTIONS";
+          const isQ = await isQueued();
+          const isD = await isDeployed();
+          if (isQ && !isD) {
+            buttonSubmit.innerHTML = "DEPLOYMENT QUEUED";
+          } else {
+            buttonSubmit.innerHTML = "NO FURTHER ACTIONS";
+          }
         }
       }
     }
@@ -218,14 +225,24 @@ const handleUserConnection = async () => {
 
 const vote = async (isVoteYes) => {
   await getJSONAndPopulateVariables();
+
+  let voteSuccess = false;
+
+  updateStatus("Voting...");
   if (isConnectedMetamask) {
-    await voteMetamask(isVoteYes);
+    voteSuccess = await voteMetamask(isVoteYes);
   } else if (isConnectedWalletConnect) {
-    await voteWalletConnect(isVoteYes);
+    voteSuccess = await voteWalletConnect(isVoteYes);
   }
 
   await refreshVoteCounters();
   await handleUserConnection();
+
+  if (voteSuccess) {
+    updateStatus(`Vote ${isVoteYes?"YES":"NO"} registered successfully`);
+  } else {
+    updateStatus(`Vote ${isVoteYes?"YES":"NO"} failed`);
+  }
 };
 
 const voteMetamask = async (isVoteYes) => {
@@ -240,12 +257,15 @@ const voteMetamask = async (isVoteYes) => {
 
       await txResponse.wait();
       refreshTermEnd();
+      return true;
       // await voteCounter(web3);
     } else {
       updateStatus(`Connected account (${account}) is not eligible for voting`);
+      return false;
     }
   } catch (err) {
     console.log(err);
+    return false;
   }
 };
 
@@ -262,11 +282,14 @@ const voteWalletConnect = async (isVoteYes) => {
         .send({ from: account });
       console.log(`Voted ${isVoteYes} successfully`);
       refreshTermEnd();
+      return true;
     } else {
       updateStatus(`Connected account (${account}) is not eligible for voting`);
+      return false;
     }
   } catch (err) {
     console.log(err);
+    return false;
   }
 };
 
@@ -352,6 +375,36 @@ const canDeploy = async () => {
   }
 };
 
+const isQueued = async () => {
+  await getJSONAndPopulateVariables();
+  try {
+    if (isConnectedMetamask) {
+      return await communityDeployerContract.isQueued();
+    } else if (isConnectedWalletConnect) {
+      return await communityDeployerContract.methods.isQueued().call();
+    }
+
+    return false;
+  } catch (err) {
+    return false;
+  }
+};
+
+const isDeployed = async () => {
+  await getJSONAndPopulateVariables();
+  try {
+    if (isConnectedMetamask) {
+      return await communityDeployerContract.isDeployed();
+    } else if (isConnectedWalletConnect) {
+      return await communityDeployerContract.methods.isDeployed().call();
+    }
+
+    return false;
+  } catch (err) {
+    return false;
+  }
+};
+
 const refreshTermEnd = async () => {
   await getJSONAndPopulateVariables();
 
@@ -377,8 +430,7 @@ const refreshTermEnd = async () => {
 const refreshVoteCounters = async () => {
   await getJSONAndPopulateVariables();
 
-  let totalYesCount = 0,
-    totalNoCount = 0;
+  let totalYesCount = null, totalNoCount = null;
   try {
     if (isConnectedMetamask) {
       totalYesCount = await communityDeployerContract.yesVoteCount();
@@ -395,8 +447,8 @@ const refreshVoteCounters = async () => {
     console.log(err);
   }
 
-  document.getElementById("yes-counter").innerHTML = totalYesCount.toString();
-  document.getElementById("no-counter").innerHTML = totalNoCount.toString();
+  document.getElementById("yes-counter").innerHTML = (totalYesCount !== null) ? totalYesCount.toString() : '--';
+  document.getElementById("no-counter").innerHTML = (totalNoCount !== null) ? totalNoCount.toString() : '--';
 };
 
 const queue = async () => {
