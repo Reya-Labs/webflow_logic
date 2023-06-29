@@ -3,7 +3,7 @@
   const ArbitrumGoerliChainId = 421613;
   const targetChainId = ArbitrumChainId;
 
-  const communityDeployerAddress = "0xE2284120d1cC6f1acd6Aded5d177386a5A49F0F3";
+  const communityVoterAddress = "0x12872b785dBC464F56086aFAB2b3ff7c27a5d007";
   const jsonPromise = $.getJSON(
     "https://cdn.jsdelivr.net/gh/Voltz-Protocol/webflow_logic@feat/v2-vote/WebFlow/votingInfo.json"
   );
@@ -23,8 +23,8 @@
   let isConnectedMetamask;
   let isConnectedWalletConnect;
 
-  let json, communityDeployerABI, merkleDistributorInfo;
-  let communityDeployerContract, account;
+  let json, communityVoterABI, merkleDistributorInfo;
+  let communityVoterContract, account;
 
   let termEnd;
 
@@ -79,18 +79,6 @@
         } else {
           await vote(yesSelected);
         }
-      } else {
-        updateStatus("Wallet not connected");
-      }
-    } else if (buttonSubmit.innerHTML === "QUEUE") {
-      if (isConnectedMetamask || isConnectedWalletConnect) {
-        await queue();
-      } else {
-        updateStatus("Wallet not connected");
-      }
-    } else if (buttonSubmit.innerHTML === "DEPLOY") {
-      if (isConnectedMetamask || isConnectedWalletConnect) {
-        await deploy();
       } else {
         updateStatus("Wallet not connected");
       }

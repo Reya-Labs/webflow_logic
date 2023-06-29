@@ -1,6 +1,6 @@
 const getJSONAndPopulateVariables = async () => {
   json = await jsonPromise;
-  communityDeployerABI = json["CommunityDeployerABI"];
+  communityVoterABI = json["CommunityVoterABI"];
   merkleDistributorInfo = json["MerkleDistributorInfo"];
 
   try {
@@ -9,17 +9,17 @@ const getJSONAndPopulateVariables = async () => {
       const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
 
-      communityDeployerContract = new ethers.Contract(
-        communityDeployerAddress,
-        communityDeployerABI,
+      communityVoterContract = new ethers.Contract(
+        communityVoterAddress,
+        communityVoterABI,
         signer
       );
 
       account = await signer.getAddress();
     } else if (isConnectedWalletConnect) {
-      communityDeployerContract = new web3.eth.Contract(
-        communityDeployerABI,
-        communityDeployerAddress
+      communityVoterContract = new web3.eth.Contract(
+        communityVoterABI,
+        communityVoterAddress
       );
 
       account = await web3.currentProvider.accounts[0];
@@ -188,23 +188,7 @@ const handleUserConnection = async () => {
         }
       }
     } else {
-      const canUserQueue = await canQueue();
-      if (canUserQueue) {
-        buttonSubmit.innerHTML = "QUEUE";
-      } else {
-        const canUserDeploy = await canDeploy();
-        if (canUserDeploy) {
-          buttonSubmit.innerHTML = "DEPLOY";
-        } else {
-          const isQ = await isQueued();
-          const isD = await isDeployed();
-          if (isQ && !isD) {
-            buttonSubmit.innerHTML = "DEPLOYMENT QUEUED";
-          } else {
-            buttonSubmit.innerHTML = "NO FURTHER ACTIONS";
-          }
-        }
-      }
+      buttonSubmit.innerHTML = "VOTE FINISHED";
     }
 
     buttonMetamask.style.display = "none";
@@ -248,7 +232,7 @@ const vote = async (isVoteYes) => {
 const voteMetamask = async (isVoteYes) => {
   try {
     if (merkleDistributorInfo[account]) {
-      const txResponse = await communityDeployerContract.castVote(
+      const txResponse = await communityVoterContract.castVote(
         merkleDistributorInfo[account]["index"],
         merkleDistributorInfo[account]["amount"],
         isVoteYes,
@@ -272,7 +256,7 @@ const voteMetamask = async (isVoteYes) => {
 const voteWalletConnect = async (isVoteYes) => {
   try {
     if (merkleDistributorInfo[account]) {
-      const receipt = await communityDeployerContract.methods
+      const receipt = await communityVoterContract.methods
         .castVote(
           merkleDistributorInfo[account]["index"],
           merkleDistributorInfo[account]["amount"],
@@ -305,7 +289,7 @@ const hasVoted = async () => {
 const hasVotedMetamask = async () => {
   try {
     if (merkleDistributorInfo[account]) {
-      return await communityDeployerContract.hasVoted(
+      return await communityVoterContract.hasVoted(
         merkleDistributorInfo[account]["index"]
       );
     }
@@ -320,7 +304,7 @@ const hasVotedMetamask = async () => {
 const hasVotedWalletConnect = async () => {
   try {
     if (merkleDistributorInfo[account]) {
-      return await communityDeployerContract.methods
+      return await communityVoterContract.methods
         .hasVoted(merkleDistributorInfo[account]["index"])
         .call();
     }
@@ -341,78 +325,14 @@ const canVote = async () => {
   return false;
 };
 
-const canQueue = async () => {
-  await getJSONAndPopulateVariables();
-  try {
-    if (isConnectedMetamask) {
-      await communityDeployerContract.callStatic.queue();
-      return true;
-    } else if (isConnectedWalletConnect) {
-      await communityDeployerContract.methods.queue().estimateGas({from: account});
-      return true;
-    }
-
-    return false;
-  } catch (err) {
-    return false;
-  }
-};
-
-const canDeploy = async () => {
-  await getJSONAndPopulateVariables();
-  try {
-    if (isConnectedMetamask) {
-      await communityDeployerContract.callStatic.deploy();
-      return true;
-    } else if (isConnectedWalletConnect) {
-      await communityDeployerContract.methods.deploy().estimateGas({from: account});
-      return true;
-    }
-
-    return false;
-  } catch (err) {
-    return false;
-  }
-};
-
-const isQueued = async () => {
-  await getJSONAndPopulateVariables();
-  try {
-    if (isConnectedMetamask) {
-      return await communityDeployerContract.isQueued();
-    } else if (isConnectedWalletConnect) {
-      return await communityDeployerContract.methods.isQueued().call();
-    }
-
-    return false;
-  } catch (err) {
-    return false;
-  }
-};
-
-const isDeployed = async () => {
-  await getJSONAndPopulateVariables();
-  try {
-    if (isConnectedMetamask) {
-      return await communityDeployerContract.isDeployed();
-    } else if (isConnectedWalletConnect) {
-      return await communityDeployerContract.methods.isDeployed().call();
-    }
-
-    return false;
-  } catch (err) {
-    return false;
-  }
-};
-
 const refreshTermEnd = async () => {
   await getJSONAndPopulateVariables();
 
   termEnd = 0;
   if (isConnectedMetamask) {
-    termEnd = await communityDeployerContract.blockTimestampVotingEnd();
+    termEnd = await communityVoterContract.blockTimestampVotingEnd();
   } else if (isConnectedWalletConnect) {
-    termEnd = await communityDeployerContract.methods
+    termEnd = await communityVoterContract.methods
       .blockTimestampVotingEnd()
       .call();
   }
@@ -433,13 +353,13 @@ const refreshVoteCounters = async () => {
   let totalYesCount = null, totalNoCount = null;
   try {
     if (isConnectedMetamask) {
-      totalYesCount = await communityDeployerContract.yesVoteCount();
-      totalNoCount = await communityDeployerContract.noVoteCount();
+      totalYesCount = await communityVoterContract.yesVoteCount();
+      totalNoCount = await communityVoterContract.noVoteCount();
     } else if (isConnectedWalletConnect) {
-      totalYesCount = await communityDeployerContract.methods
+      totalYesCount = await communityVoterContract.methods
         .yesVoteCount()
         .call();
-      totalNoCount = await communityDeployerContract.methods
+      totalNoCount = await communityVoterContract.methods
         .noVoteCount()
         .call();
     }
@@ -449,38 +369,4 @@ const refreshVoteCounters = async () => {
 
   document.getElementById("yes-counter").innerHTML = (totalYesCount !== null) ? totalYesCount.toString() : '--';
   document.getElementById("no-counter").innerHTML = (totalNoCount !== null) ? totalNoCount.toString() : '--';
-};
-
-const queue = async () => {
-  await getJSONAndPopulateVariables();
-
-  try {
-    if (isConnectedMetamask) {
-      const tx = await communityDeployerContract.queue();
-      await tx.wait();
-    } else if (isConnectedWalletConnect) {
-      await communityDeployerContract.methods.queue().send({ from: account });
-    }
-
-    await handleUserConnection();
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const deploy = async () => {
-  await getJSONAndPopulateVariables();
-
-  try {
-    if (isConnectedMetamask) {
-      const tx = await communityDeployerContract.deploy();
-      await tx.wait();
-    } else if (isConnectedWalletConnect) {
-      await communityDeployerContract.methods.deploy().send({ from: account });
-    }
-
-    await handleUserConnection();
-  } catch (err) {
-    console.log(err);
-  }
 };
